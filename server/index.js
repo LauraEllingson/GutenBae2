@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import bcrypt from "bcryptjs";
 import path from "path"; // Use ES module import
-import { fileURLToPath } from "url"; // Required for `__dirname` in ES modules
+import { fileURLToPath } from "url"; 
 import UserModel from "./models/user.js";
 
 const app = express();
