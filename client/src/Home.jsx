@@ -96,7 +96,7 @@ const Home = () => {
   const shareResult = (book) => {
     const url = book?.infoLink || 'https://example.com';  // Fallback URL if infoLink is not available.
     if (navigator.share) {
-      // share
+      // If the browser supports the Web Share API
       navigator.share({
         title: book?.title || 'Check out this book!',
         url: url,
