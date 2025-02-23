@@ -4,7 +4,7 @@ import cors from "cors";
 import bcrypt from "bcryptjs";
 import path from "path"; // Use ES module import
 import { fileURLToPath } from "url"; // Required for `__dirname` in ES modules
-import UserModel from "./models/User.js";
+import UserModel from "./server/models/User.js";
 
 const app = express();
 app.use(express.json());
