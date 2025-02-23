@@ -1,18 +1,21 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import bcrypt from "bcryptjs";
-import path from "path"; // Use ES module import
-import { fileURLToPath } from "url"; 
-import UserModel from "./models/user.js";
+import path from "path";
+import { fileURLToPath } from "url";
+import UserModel from "./models/User.js";
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-// MongoDB Connection
+// MongoDB Connection using environment variable
 mongoose
-  .connect("mongodb+srv://lellingson:12345@cluster0.djcxo.mongodb.net/ellingson_app?retryWrites=true&w=majority", {
+  .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -55,11 +58,11 @@ app.post("/login", async (req, res) => {
   res.json({ message: "Login successful" });
 });
 
-// Fix `__dirname` for ES modules
+// Fix __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Serve React static files **AFTER API routes**
+// Serve React static files AFTER API routes
 app.use(express.static(path.join(__dirname, "../client/build")));
 
 app.get("*", (req, res) => {
