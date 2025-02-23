@@ -14,14 +14,10 @@ app.use(express.json());
 app.use(cors());
 
 // MongoDB Connection using environment variable
-mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.log("MongoDB Connection Error:", err));
-
+  
 // User Registration
 app.post("/register", async (req, res) => {
   const { name, email, password } = req.body;
