@@ -1,0 +1,8 @@
+.book-title,
+.book-author,
+.book-topic {
+  word-wrap: break-word; /* Ensures long words break */
+  overflow-wrap: break-word;
+  white-space: normal; /* Allows text to wrap properly */
+  max-width: 100%; /* Prevents text from spilling outside */
+}

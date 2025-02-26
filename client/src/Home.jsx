@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import './index.css'; 
+
+
 
 const Home = () => {
   const [query, setQuery] = useState('');
@@ -69,6 +72,7 @@ const Home = () => {
           gap: '15px',
           padding: '10px',
           whiteSpace: 'nowrap'
+        
         }}>
           {isLoading ? <p>Searching...</p> : (
             freeResults.length === 0 ? <p></p> :
@@ -81,9 +85,10 @@ const Home = () => {
                     borderRadius: '8px',
                     padding: '10px',
                     textAlign: 'center'
+                    
                   }}>
-                    <h3>{book.title}</h3>
-                    <p><strong>Author(s):</strong> {book.authors?.map(a => a.name).join(', ') || 'Unknown'}</p>
+                    <h3 className="book-title">{book.title}</h3>
+                    <p className="book-author"><strong>Author(s):</strong> {book.authors?.map(a => a.name).join(', ') || 'Unknown'}</p>
                     {book.subjects?.length > 0 && <p className="book-topic"><strong>Topic:</strong> {book.subjects[1]}</p>}
                     {book.formats?.['image/jpeg'] && (
                       <img src={book.formats['image/jpeg']} alt="Book thumbnail" style={{ maxWidth: '100px' }} />
