@@ -75,8 +75,8 @@ const Home = () => {
               freeResults.map((book, index) => (
                 book.title && (
                   <div key={index} style={{
-                    minWidth: '350px',
-                    minHeight:'400px',
+                    minWidth: '250px',
+                    minHeight:'300px',
                     border: '1px solid #ccc',
                     borderRadius: '8px',
                     padding: '10px',
@@ -115,8 +115,8 @@ const Home = () => {
             googleResults.length === 0 ? <p></p> :
               googleResults.map((book, index) => (
                 <div key={index} style={{
-                  minWidth: '450px',
-                  minHeight:'400px',
+                  minWidth: '250px',
+                  minHeight:'300px',
                   border: '1px solid #ccc',
                   borderRadius: '8px',
                   padding: '10px',
