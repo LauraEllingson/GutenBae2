@@ -93,6 +93,7 @@ const Home = () => {
                     {book.formats?.['image/jpeg'] && (
                       <img src={book.formats['image/jpeg']} alt="Book thumbnail" style={{ maxWidth: '100px' }} />
                       
+            
                     )}
                     <p><strong>Download:</strong>
                       {book.formats?.['application/epub+zip'] && (<a href={book.formats['application/epub+zip']} target="_blank" rel="noopener noreferrer"> EPUB</a>)} |
@@ -109,6 +110,7 @@ const Home = () => {
       {/* Google Books Results (Scrollable Cards) */}
       <div style={{ width: '100%', marginTop: '20px' }}>
         <h2>Google Books Results</h2>
+        <div className="slider-container"></div>
         <div style={{
           display: 'flex',
           overflowX: 'auto',
@@ -119,7 +121,7 @@ const Home = () => {
           {isLoading ? <p>Searching...</p> : (
             googleResults.length === 0 ? <p></p> :
               googleResults.map((book, index) => (
-                <div key={index} style={{
+                <div key={index} className="book-card" style={{
                   minWidth: '250px',
                   minHeight:'300px',
                   border: '1px solid #ccc',
@@ -127,8 +129,8 @@ const Home = () => {
                   padding: '10px',
                   textAlign: 'center'
                 }}>
-                  <h3>{book.volumeInfo?.title || 'No title available'}</h3>
-                  <p><strong>Author(s):</strong> {book.volumeInfo?.authors?.join(', ') || 'Unknown'}</p>
+                  <h3 className="book-title">{book.volumeInfo?.title || 'No title available'}</h3>
+                  <p className="book-author"><strong>Author(s):</strong> {book.volumeInfo?.authors?.join(', ') || 'Unknown'}</p>
                   {book.volumeInfo?.imageLinks?.thumbnail && (
                     <img src={book.volumeInfo.imageLinks.thumbnail} alt="Book thumbnail" style={{ maxWidth: '100px' }} />
                   )}
