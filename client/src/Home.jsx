@@ -25,13 +25,13 @@ const Home = () => {
     try {
       const gutendexResponse = await fetch(gutendexApiUrl);
       const googleResponse = await fetch(googleApiUrl);
-      
+
       if (!gutendexResponse.ok) throw new Error('Gutendex API error');
       if (!googleResponse.ok) throw new Error('Google Books API error');
-      
+
       const gutendexData = await gutendexResponse.json();
       const googleData = await googleResponse.json();
-      
+
       setFreeResults(gutendexData.results || []);
       setGoogleResults(googleData.items || []);
     } catch (error) {
@@ -42,7 +42,7 @@ const Home = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
       <div style={{ width: '100%', textAlign: 'right', marginBottom: '20px' }}>
         <Link to="/register"><button>Register</button></Link>
         <Link to="/login"><button>Login</button></Link>
@@ -59,54 +59,78 @@ const Home = () => {
         </select>
         <button onClick={handleSearch} disabled={isLoading}>{isLoading ? 'Searching...' : 'Search'}</button>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-        <div style={{ width: '48%' }}>
-          <h2>Free Books (Gutendex)</h2>
-          {isLoading ? <p>Searching...</p> : (freeResults.length === 0 ? <p></p> :
-            freeResults.map((book, index) => (
-              book.title && (
-                <div key={index} style={{ border: '1px solid #ccc', marginBottom: '10px', padding: '10px' }}>
-                  <h3>{book.title}</h3>
-                  <p><strong>Author(s):</strong> {book.authors?.map(a => a.name).join(', ') || 'Unknown'}</p>
-                  {book.translators?.length > 0 && (
-                    <p><strong>Translated by:</strong> {book.translators.map(t => t.name).join(', ')}</p>
-                  )}
-                  {book.publication_date && (
-                    <p><strong>Publication Date:</strong> {book.publication_date}</p>
-                  )}
-                  {book.summaries?.length > 0 && (
-                    <p><strong>Description:</strong> {book.summaries[0]}</p>
-                  )}
-                  {book.subjects?.length > 0 && (
-                    <p><strong>Topic/Genre:</strong> {book.subjects.join(', ')}</p>
-                  )}
-                  {book.formats?.['image/jpeg'] && (
-                    <img src={book.formats['image/jpeg']} alt="Book thumbnail" style={{ maxWidth: '100px' }} />
-                  )}
-                  <p><strong>Download:</strong>
-                    {book.formats?.['application/epub+zip'] && (<a href={book.formats['application/epub+zip']} target="_blank" rel="noopener noreferrer"> EPUB</a>)} |
-                    {book.formats?.['application/x-mobipocket-ebook'] && (<a href={book.formats['application/x-mobipocket-ebook']} target="_blank" rel="noopener noreferrer"> Kindle</a>)} |
-                    {book.formats?.['text/html'] && (<a href={book.formats['text/html']} target="_blank" rel="noopener noreferrer"> HTML</a>)}
-                  </p>
-                </div>
-              )
-            ))
+
+      {/* Gutendex Results (Scrollable Cards) */}
+      <div style={{ width: '100%', marginTop: '20px' }}>
+        <h2>Free Books (Gutendex)</h2>
+        <div style={{
+          display: 'flex',
+          overflowX: 'auto',
+          gap: '15px',
+          padding: '10px',
+          whiteSpace: 'nowrap'
+        }}>
+          {isLoading ? <p>Searching...</p> : (
+            freeResults.length === 0 ? <p></p> :
+              freeResults.map((book, index) => (
+                book.title && (
+                  <div key={index} style={{
+                    minWidth: '350px',
+                    minHeight:'400px',
+                    border: '1px solid #ccc',
+                    borderRadius: '8px',
+                    padding: '10px',
+                    textAlign: 'center'
+                  }}>
+                    <h3>{book.title}</h3>
+                    <p><strong>Author(s):</strong> {book.authors?.map(a => a.name).join(', ') || 'Unknown'}</p>
+                    {book.subjects?.length > 0 && <p className="book-topic"><strong>Topic:</strong> {book.subjects[1]}</p>}
+                    {book.formats?.['image/jpeg'] && (
+                      <img src={book.formats['image/jpeg']} alt="Book thumbnail" style={{ maxWidth: '100px' }} />
+                      
+                    )}
+                    <p><strong>Download:</strong>
+                      {book.formats?.['application/epub+zip'] && (<a href={book.formats['application/epub+zip']} target="_blank" rel="noopener noreferrer"> EPUB</a>)} |
+                      {book.formats?.['application/x-mobipocket-ebook'] && (<a href={book.formats['application/x-mobipocket-ebook']} target="_blank" rel="noopener noreferrer"> Kindle</a>)} |
+                      {book.formats?.['text/html'] && (<a href={book.formats['text/html']} target="_blank" rel="noopener noreferrer"> HTML</a>)}
+                    </p>
+                  </div>
+                )
+              ))
           )}
         </div>
-        <div style={{ width: '48%' }}>
-          <h2>Google Books Results</h2>
-          {isLoading ? <p>Searching...</p> : (googleResults.length === 0 ? <p></p> :
-            googleResults.map((book, index) => (
-              <div key={index} style={{ border: '1px solid #ccc', marginBottom: '10px', padding: '10px' }}>
-                <h3>{book.volumeInfo?.title || 'No title available'}</h3>
-                <p><strong>Author(s):</strong> {book.volumeInfo?.authors?.join(', ') || 'Unknown'}</p>
-                {book.volumeInfo?.imageLinks?.thumbnail && (
-                  <img src={book.volumeInfo.imageLinks.thumbnail} alt="Book thumbnail" style={{ maxWidth: '100px' }} />
-                )}
-                <p>{book.volumeInfo?.description?.substring(0, 200) || 'No description available'}...</p>
-                <a href={book.volumeInfo?.infoLink} target="_blank" rel="noopener noreferrer">Read more</a>
-              </div>
-            ))
+      </div>
+
+      {/* Google Books Results (Scrollable Cards) */}
+      <div style={{ width: '100%', marginTop: '20px' }}>
+        <h2>Google Books Results</h2>
+        <div style={{
+          display: 'flex',
+          overflowX: 'auto',
+          gap: '15px',
+          padding: '10px',
+          whiteSpace: 'nowrap'
+        }}>
+          {isLoading ? <p>Searching...</p> : (
+            googleResults.length === 0 ? <p></p> :
+              googleResults.map((book, index) => (
+                <div key={index} style={{
+                  minWidth: '450px',
+                  minHeight:'400px',
+                  border: '1px solid #ccc',
+                  borderRadius: '8px',
+                  padding: '10px',
+                  textAlign: 'center'
+                }}>
+                  <h3>{book.volumeInfo?.title || 'No title available'}</h3>
+                  <p><strong>Author(s):</strong> {book.volumeInfo?.authors?.join(', ') || 'Unknown'}</p>
+                  {book.volumeInfo?.imageLinks?.thumbnail && (
+                    <img src={book.volumeInfo.imageLinks.thumbnail} alt="Book thumbnail" style={{ maxWidth: '100px' }} />
+                  )}
+            
+                  <a href={book.volumeInfo?.infoLink} target="_blank" rel="noopener noreferrer">Read More</a>
+                </div>
+              ))
           )}
         </div>
       </div>
