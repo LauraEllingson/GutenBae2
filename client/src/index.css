@@ -6,3 +6,33 @@
   white-space: normal; /* Allows text to wrap properly */
   max-width: 100%; /* Prevents text from spilling outside */
 }
+/* Ensure inputs and buttons are mobile-friendly */
+
+  
+ 
+  
+  .book-card {
+    min-width: 250px;
+    flex-shrink: 0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  @media (max-width: 768px) {
+    .slider-container {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  
+    .book-card {
+      width: 90%;
+    }
+  
+    .book-details {
+      width: 95%;
+      padding: 15px;
+    }
+  }
+  
