@@ -8,6 +8,9 @@ import path from "path";
 import { fileURLToPath } from "url";
 import UserModel from "./models/User.js";
 import jwt from "jsonwebtoken";
+import LikedBook from './models/LikedBook.js'; // Import the LikedBook model
+import UserModel from './models/User.js'; // Import the User model
+
 
 const app = express();
 app.use(express.json());
@@ -72,6 +75,44 @@ const authenticateToken = (req, res, next) => {
 };
 app.post("/verify-token", authenticateToken, (req, res) => {
   res.json({ user: req.user });
+});
+// API route to handle liking a book
+app.post("/like-book", authenticateToken, async (req, res) => {
+  const { bookId, title, authors, imageUrl, description } = req.body;
+  const user = req.user; // Get the authenticated user from the token
+
+  if (!bookId || !title || !authors || !imageUrl || !description) {
+    return res.status(400).json({ error: "All book fields are required" });
+  }
+
+  try {
+    // Create a new LikedBook document
+    const newLikedBook = new LikedBook({
+      bookId,
+      title,
+      authors,
+      imageUrl,
+      description,
+    });
+
+    // Save the liked book to the LikedBook collection
+    await newLikedBook.save();
+
+    // Add the liked book to the user's likedBooks array
+    const userWithUpdatedBooks = await UserModel.findByIdAndUpdate(
+      user._id,
+      { $push: { likedBooks: newLikedBook._id } },
+      { new: true }
+    );
+
+    res.json({
+      message: "Book added to your dashboard",
+      likedBooks: userWithUpdatedBooks.likedBooks,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Error liking the book" });
+  }
 });
 
 // Fix __dirname for ES modules
