@@ -6,19 +6,23 @@ const Login = () => {
   const [password, setPassword] = useState("");
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      const res = await axios.post("http://localhost:3001/login", { email, password });
+  try {
+    const res = await axios.post("http://localhost:3001/login", { email, password });
 
-      if (res.status === 200) {
-        alert("Login Successful!");
-        window.location.href = "/dashboard"; 
-      }
-    } catch (error) {
-      alert("Login failed. Try again.");
+    if (res.data.token) { 
+      localStorage.setItem("token", res.data.token); // Store JWT token
+      alert("Login Successful!");
+      window.location.href = "/dashboard"; 
+    } else {
+      alert(res.data.error || "Login failed. Try again."); // Show backend error
     }
-  };
+  } catch (error) {
+    alert(error.response?.data?.error || "Login failed. Try again."); // Handle errors properly
+  }
+};
+
 
   return (
     <div>

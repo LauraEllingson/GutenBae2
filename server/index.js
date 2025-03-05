@@ -7,6 +7,7 @@ import bcrypt from "bcryptjs";
 import path from "path";
 import { fileURLToPath } from "url";
 import UserModel from "./models/User.js";
+import jwt from "jsonwebtoken";
 
 const app = express();
 app.use(express.json());
@@ -42,15 +43,35 @@ app.post("/login", async (req, res) => {
 
   const user = await UserModel.findOne({ email });
   if (!user) {
-    return res.json({ error: "User not found" });
+    return res.status(400).json({ error: "User not found" });
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
-    return res.json({ error: "Wrong password" });
+    return res.status(400).json({ error: "Wrong password" });
   }
 
-  res.json({ message: "Login successful" });
+  // Generate JWT token on successful login
+  const token = jwt.sign({ userId: user._id }, process.env.JWT_ACCESS_SECRET, {
+    expiresIn: "1h",
+  });
+
+  res.json({ message: "Login successful", token });
+});
+const authenticateToken = (req, res, next) => {
+  const token = req.header("Authorization");
+
+  if (!token) return res.status(401).json({ error: "Access denied" });
+
+  jwt.verify(token.split(" ")[1], process.env.JWT_ACCESS_SECRET, (err, decoded) => {
+    if (err) return res.status(403).json({ error: "Invalid token" });
+
+    req.user = decoded; // Store decoded token data
+    next();
+  });
+};
+app.post("/verify-token", authenticateToken, (req, res) => {
+  res.json({ user: req.user });
 });
 
 // Fix __dirname for ES modules
