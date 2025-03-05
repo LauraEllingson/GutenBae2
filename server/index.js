@@ -52,11 +52,11 @@ app.post("/login", async (req, res) => {
   }
 
   // Generate JWT token on successful login
-  const token = jwt.sign({ userId: user._id }, process.env.JWT_ACCESS_SECRET, {
+  const token = jwt.sign({ name: user.name }, process.env.JWT_ACCESS_SECRET, {
     expiresIn: "1h",
   });
 
-  res.json({ message: "Login successful", token });
+  res.json({ message: "Login successful", token, name: user.name });
 });
 const authenticateToken = (req, res, next) => {
   const token = req.header("Authorization");
