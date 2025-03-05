@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './index.css'; 
 
-
-
 const Home = () => {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState('all');
@@ -52,15 +50,29 @@ const Home = () => {
       </div>
       <h1>Welcome to GutenBae!</h1>
       <div>
-        <input type="text" placeholder="Enter a keyword" value={query} onChange={(e) => setQuery(e.target.value)} />
-        <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+        <input 
+          type="text" 
+          placeholder="Enter a keyword" 
+          value={query} 
+          onChange={(e) => setQuery(e.target.value)} 
+          id="search-query" // Added id
+          name="search-query" // Added name
+        />
+        <select 
+          value={filter} 
+          onChange={(e) => setFilter(e.target.value)} 
+          id="filter" // Added id
+          name="filter" // Added name
+        >
           <option value="all">All</option>
           <option value="title">Title</option>
           <option value="author">Author</option>
           <option value="subject">Subject</option>
           <option value="text">Full Text</option>
         </select>
-        <button onClick={handleSearch} disabled={isLoading}>{isLoading ? 'Searching...' : 'Search'}</button>
+        <button onClick={handleSearch} disabled={isLoading} id="search-button"> 
+          {isLoading ? 'Searching...' : 'Search'}
+        </button>
       </div>
 
       {/* Gutendex Results (Scrollable Cards) */}
@@ -72,7 +84,6 @@ const Home = () => {
           gap: '15px',
           padding: '10px',
           whiteSpace: 'nowrap'
-        
         }}>
           {isLoading ? <p>Searching...</p> : (
             freeResults.length === 0 ? <p></p> :
@@ -85,20 +96,18 @@ const Home = () => {
                     borderRadius: '8px',
                     padding: '10px',
                     textAlign: 'center'
-                    
                   }}>
                     <h3 className="book-title">{book.title}</h3>
                     <p className="book-author"><strong>Author(s):</strong> {book.authors?.map(a => a.name).join(', ') || 'Unknown'}</p>
                     {book.subjects?.length > 0 && <p className="book-topic"><strong>Topic:</strong> {book.subjects[1]}</p>}
                     {book.formats?.['image/jpeg'] && (
                       <img src={book.formats['image/jpeg']} alt="Book thumbnail" style={{ maxWidth: '100px' }} />
-                      
-            
                     )}
                     <p><strong>Download:</strong>
                       {book.formats?.['application/epub+zip'] && (<a href={book.formats['application/epub+zip']} target="_blank" rel="noopener noreferrer"> EPUB</a>)} |
                       {book.formats?.['application/x-mobipocket-ebook'] && (<a href={book.formats['application/x-mobipocket-ebook']} target="_blank" rel="noopener noreferrer"> Kindle</a>)} |
                       {book.formats?.['text/html'] && (<a href={book.formats['text/html']} target="_blank" rel="noopener noreferrer"> HTML</a>)}
+                      <button onClick={() => handleLike(book.bookId)}>Like</button>
                     </p>
                   </div>
                 )
@@ -134,7 +143,6 @@ const Home = () => {
                   {book.volumeInfo?.imageLinks?.thumbnail && (
                     <img src={book.volumeInfo.imageLinks.thumbnail} alt="Book thumbnail" style={{ maxWidth: '100px' }} />
                   )}
-            
                   <a href={book.volumeInfo?.infoLink} target="_blank" rel="noopener noreferrer">Read More</a>
                 </div>
               ))
