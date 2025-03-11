@@ -8,8 +8,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 import UserModel from "./models/User.js";
 import jwt from "jsonwebtoken";
-import LikedBook from './models/LikedBook.js'; // Import the LikedBook model
-import UserModel from './models/User.js'; // Import the User model
+import LikedBook from './models/LikedBooks.js'; // Import LikedBook model
+
 
 
 const app = express();
@@ -55,9 +55,10 @@ app.post("/login", async (req, res) => {
   }
 
   // Generate JWT token on successful login
-  const token = jwt.sign({ name: user.name }, process.env.JWT_ACCESS_SECRET, {
+  const token = jwt.sign({ _id: user._id, name: user.name }, process.env.JWT_ACCESS_SECRET, {
     expiresIn: "1h",
   });
+  
 
   res.json({ message: "Login successful", token, name: user.name });
 });
@@ -76,44 +77,59 @@ const authenticateToken = (req, res, next) => {
 app.post("/verify-token", authenticateToken, (req, res) => {
   res.json({ user: req.user });
 });
-// API route to handle liking a book
+//send liked books to dashboard
 app.post("/like-book", authenticateToken, async (req, res) => {
   const { bookId, title, authors, imageUrl, description } = req.body;
-  const user = req.user; // Get the authenticated user from the token
-
-  if (!bookId || !title || !authors || !imageUrl || !description) {
-    return res.status(400).json({ error: "All book fields are required" });
-  }
+  const userId = req.user._id; // Get the userId from the token payload
 
   try {
-    // Create a new LikedBook document
-    const newLikedBook = new LikedBook({
-      bookId,
-      title,
-      authors,
-      imageUrl,
-      description,
-    });
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
-    // Save the liked book to the LikedBook collection
+    // Check if the book is already in the likedBooks array
+    const bookExists = user.likedBooks.some(book => book.toString() === bookId);
+    if (bookExists) {
+      return res.status(400).json({ error: "Book already liked" });
+    }
+
+    // Create a new LikedBook document
+    const newLikedBook = new LikedBook({ bookId, title, authors, imageUrl, description });
+
+    // Save the LikedBook document
     await newLikedBook.save();
 
-    // Add the liked book to the user's likedBooks array
-    const userWithUpdatedBooks = await UserModel.findByIdAndUpdate(
-      user._id,
-      { $push: { likedBooks: newLikedBook._id } },
-      { new: true }
-    );
+    // Add the new LikedBook's _id to the user's likedBooks array
+    user.likedBooks.push(newLikedBook._id);
+    await user.save();
 
-    res.json({
-      message: "Book added to your dashboard",
-      likedBooks: userWithUpdatedBooks.likedBooks,
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Error liking the book" });
+    res.json({ message: "Book liked successfully", likedBook: newLikedBook });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Failed to like book" });
   }
 });
+
+
+
+// Route to get the liked books of a user
+app.get("/users/:userId/liked-books", authenticateToken, async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await UserModel.findById(userId).populate("likedBooks");
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json({ likedBooks: user.likedBooks });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Failed to fetch liked books" });
+  }
+});
+
 
 // Fix __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);

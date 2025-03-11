@@ -4,13 +4,13 @@ const LikedBookSchema = new mongoose.Schema(
   {
     bookId: { type: String, required: true },
     title: { type: String, required: true },
-    authors: { type: String, required: true },
+    authors: { type: [String], required: true },
     imageUrl: { type: String, required: true },
     description: { type: String, required: true },
   },
-  { timestamps: true } // Automatically adds createdAt and updatedAt fields
+  { timestamps: true }
 );
 
-const LikedBook = mongoose.model('LikedBook', LikedBookSchema); // Collection name for liked books
-export default LikedBook;
+const LikedBook = mongoose.model('LikedBook', LikedBookSchema);
 
+export default LikedBook; // Default export

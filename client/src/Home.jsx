@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+// src/Home.jsx
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import './index.css'; 
-
-
+import './index.css';
+import axios from "axios";
 
 const Home = () => {
   const [query, setQuery] = useState('');
@@ -10,7 +10,20 @@ const Home = () => {
   const [freeResults, setFreeResults] = useState([]);
   const [googleResults, setGoogleResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
 
+  // Check if user is logged in
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setLoggedIn(!!token);
+  }, []);
+  
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setLoggedIn(false);
+  };
+  
+  //  search books
   const handleSearch = async () => {
     if (!query.trim()) {
       setFreeResults([]);
@@ -43,24 +56,68 @@ const Home = () => {
       setIsLoading(false);
     }
   };
+  
+
+  // like a book
+  const handleLike = async (book) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Please log in to like a book");
+      return;
+    }
+
+    // Prep liked book data
+    const likedBookData = {
+      bookId: book.id || book.bookId, 
+      title: book.title,
+      authors: book.authors ? book.authors.map(author => author.name) : ["Unknown"],
+      imageUrl: book.formats?.['image/jpeg'] || "",
+      description: book.description || "No description available",
+    };
+
+    try {
+      await axios.post(
+        "http://localhost:3001/like-book",
+        likedBookData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("Book liked successfully!");
+    } catch (error) {
+      alert("Failed to like book: " + (error.response?.data.error || error.message));
+    }
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+      {/* Top Navigation */}
       <div style={{ width: '100%', textAlign: 'right', marginBottom: '20px' }}>
-        <Link to="/register"><button>Register</button></Link>
-        <Link to="/login"><button>Login</button></Link>
+        {loggedIn ? (
+           <>
+          <Link to="/dashboard"><button>Dashboard</button></Link>
+          <button onClick={handleLogout}>Logout</button>
+          </>
+        ) : (
+          <>
+            <Link to="/register"><button>Register</button></Link>
+            <Link to="/login"><button>Login</button></Link>
+          </>
+        )}
       </div>
+
       <h1>Welcome to GutenBae!</h1>
       <div>
-        <input type="text" placeholder="Enter a keyword" value={query} onChange={(e) => setQuery(e.target.value)} />
-        <select value={filter} onChange={(e) => setFilter(e.target.value)}>
-          <option value="all">All</option>
-          <option value="title">Title</option>
-          <option value="author">Author</option>
-          <option value="subject">Subject</option>
-          <option value="text">Full Text</option>
-        </select>
-        <button onClick={handleSearch} disabled={isLoading}>{isLoading ? 'Searching...' : 'Search'}</button>
+        <input 
+          type="text" 
+          placeholder="Enter a keyword" 
+          value={query} 
+          onChange={(e) => setQuery(e.target.value)} 
+          id="search-query"
+          name="search-query"
+        />
+
+        <button onClick={handleSearch} disabled={isLoading} id="search-button"> 
+          {isLoading ? 'Searching...' : 'Search'}
+        </button>
       </div>
 
       {/* Gutendex Results (Scrollable Cards) */}
@@ -72,10 +129,9 @@ const Home = () => {
           gap: '15px',
           padding: '10px',
           whiteSpace: 'nowrap'
-        
         }}>
           {isLoading ? <p>Searching...</p> : (
-            freeResults.length === 0 ? <p></p> :
+            freeResults.length === 0 ? <p>No results found.</p> :
               freeResults.map((book, index) => (
                 book.title && (
                   <div key={index} style={{
@@ -85,20 +141,29 @@ const Home = () => {
                     borderRadius: '8px',
                     padding: '10px',
                     textAlign: 'center'
-                    
                   }}>
                     <h3 className="book-title">{book.title}</h3>
-                    <p className="book-author"><strong>Author(s):</strong> {book.authors?.map(a => a.name).join(', ') || 'Unknown'}</p>
-                    {book.subjects?.length > 0 && <p className="book-topic"><strong>Topic:</strong> {book.subjects[1]}</p>}
+                    <p className="book-author">
+                      <strong>Author(s):</strong> {book.authors?.map(a => a.name).join(', ') || 'Unknown'}
+                    </p>
+                    {book.subjects?.length > 0 && (
+                      <p className="book-topic"><strong>Topic:</strong> {book.subjects[1]}</p>
+                    )}
                     {book.formats?.['image/jpeg'] && (
                       <img src={book.formats['image/jpeg']} alt="Book thumbnail" style={{ maxWidth: '100px' }} />
-                      
-            
                     )}
-                    <p><strong>Download:</strong>
-                      {book.formats?.['application/epub+zip'] && (<a href={book.formats['application/epub+zip']} target="_blank" rel="noopener noreferrer"> EPUB</a>)} |
-                      {book.formats?.['application/x-mobipocket-ebook'] && (<a href={book.formats['application/x-mobipocket-ebook']} target="_blank" rel="noopener noreferrer"> Kindle</a>)} |
-                      {book.formats?.['text/html'] && (<a href={book.formats['text/html']} target="_blank" rel="noopener noreferrer"> HTML</a>)}
+                    <p>
+                      <strong>Download:</strong>
+                      {book.formats?.['application/epub+zip'] && (
+                        <a href={book.formats['application/epub+zip']} target="_blank" rel="noopener noreferrer"> EPUB</a>
+                      )} |
+                      {book.formats?.['application/x-mobipocket-ebook'] && (
+                        <a href={book.formats['application/x-mobipocket-ebook']} target="_blank" rel="noopener noreferrer"> Kindle</a>
+                      )} |
+                      {book.formats?.['text/html'] && (
+                        <a href={book.formats['text/html']} target="_blank" rel="noopener noreferrer"> HTML</a>
+                      )}
+                      <button onClick={() => handleLike(book)}>❤️</button>
                     </p>
                   </div>
                 )
@@ -119,7 +184,7 @@ const Home = () => {
           whiteSpace: 'nowrap'
         }}>
           {isLoading ? <p>Searching...</p> : (
-            googleResults.length === 0 ? <p></p> :
+            googleResults.length === 0 ? <p>No results found.</p> :
               googleResults.map((book, index) => (
                 <div key={index} className="book-card" style={{
                   minWidth: '250px',
@@ -129,12 +194,15 @@ const Home = () => {
                   padding: '10px',
                   textAlign: 'center'
                 }}>
-                  <h3 className="book-title">{book.volumeInfo?.title || 'No title available'}</h3>
-                  <p className="book-author"><strong>Author(s):</strong> {book.volumeInfo?.authors?.join(', ') || 'Unknown'}</p>
+                  <h3 className="book-title">
+                    {book.volumeInfo?.title || 'No title available'}
+                  </h3>
+                  <p className="book-author">
+                    <strong>Author(s):</strong> {book.volumeInfo?.authors?.join(', ') || 'Unknown'}
+                  </p>
                   {book.volumeInfo?.imageLinks?.thumbnail && (
                     <img src={book.volumeInfo.imageLinks.thumbnail} alt="Book thumbnail" style={{ maxWidth: '100px' }} />
                   )}
-            
                   <a href={book.volumeInfo?.infoLink} target="_blank" rel="noopener noreferrer">Read More</a>
                 </div>
               ))

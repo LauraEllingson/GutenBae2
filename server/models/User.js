@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import LikedBook from './LikedBook.js'; // Import the LikedBook model
+import LikedBook from './LikedBooks.js'; // Import the LikedBook model
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
