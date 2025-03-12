@@ -87,7 +87,6 @@ const Dashboard = () => {
               <img src={book.imageUrl} alt={book.title} />
               <h3>{book.title}</h3>
               <p>{book.authors.join(", ")}</p>
-              <p>{book.description}</p>
               <div className="card-buttons">
                 <button
                   onClick={(e) => {

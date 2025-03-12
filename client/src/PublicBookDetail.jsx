@@ -12,7 +12,7 @@ const PublicBookDetail = () => {
     axios
       .get(`https://gutendex.com/books/${id}`)
       .then((res) => {
-        console.log("Fetched book:", res.data);
+        console.log("Fetched book from Gutendex:", res.data);
         if (res.data.detail) {
           setError(res.data.detail);
         } else {
@@ -27,7 +27,7 @@ const PublicBookDetail = () => {
 
   const handleShare = () => {
     if (!book) return;
-    const detailURL = `${window.location.origin}/shared-book/${book.id}`; //share url 
+    const detailURL = window.location.href;
     const shareData = {
       title: book.title,
       text: `Check out this book: ${book.title} by ${book.authors.map(a => a.name).join(", ")}`,
@@ -35,8 +35,7 @@ const PublicBookDetail = () => {
     };
 
     if (navigator.share) {
-      navigator
-        .share(shareData)
+      navigator.share(shareData)
         .then(() => console.log("Shared successfully"))
         .catch((error) => {
           if (error.name === "AbortError") {
@@ -46,8 +45,7 @@ const PublicBookDetail = () => {
           }
         });
     } else {
-      navigator.clipboard
-        .writeText(detailURL)
+      navigator.clipboard.writeText(detailURL)
         .then(() => console.log("Link copied to clipboard"))
         .catch((error) => console.error("Error copying link:", error));
     }
@@ -56,7 +54,7 @@ const PublicBookDetail = () => {
   if (error) return <p>{error}</p>;
   if (!book) return <p>Loading...</p>;
 
-  // Use summaries as description; join them if available.
+  // Use the "summaries" array as description, if available.
   const description = book.summaries && book.summaries.length > 0 
     ? book.summaries.join("\n\n")
     : "No description available";
@@ -103,4 +101,3 @@ const PublicBookDetail = () => {
 };
 
 export default PublicBookDetail;
-
