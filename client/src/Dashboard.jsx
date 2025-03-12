@@ -21,7 +21,7 @@ const Dashboard = () => {
     // Verify token with backend
     axios
       .post(
-        "https://gutenbae2.onrender.com/verify-token",
+        "https://gutenbae2.onrender.com/verify-token", //fixed mobile login issues
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       )
