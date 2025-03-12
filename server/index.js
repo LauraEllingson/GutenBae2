@@ -157,8 +157,8 @@ app.delete("/like-book/:id", authenticateToken, async (req, res) => {
     res.json({ error: "Failed to delete liked book" });
   }
 });
-// Public endpoint to get details of a shared liked book
-app.get("/shared-book/:id", async (req, res) => {
+// get likedbook details to share
+app.get("/liked-book/:id", async (req, res) => {
   const bookId = req.params.id;
   
   try {
@@ -166,14 +166,12 @@ app.get("/shared-book/:id", async (req, res) => {
     if (!book) {
       return res.json({ error: "Book not found" });
     }
-    // return only public details:
     res.json({ book });
   } catch (error) {
     console.error(error);
     res.json({ error: "Failed to load book details" });
   }
 });
-
 
 
 
