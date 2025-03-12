@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom"; // Import Link
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import "./index.css";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -11,7 +12,6 @@ const Dashboard = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    // Check if token exists, if not, redirect to login
     if (!token) {
       alert("Access denied. Please log in.");
       navigate("/login");
@@ -20,20 +20,22 @@ const Dashboard = () => {
 
     // Verify token with backend
     axios
-      .post("http://localhost:3001/verify-token", {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      .post(
+        "http://localhost:3001/verify-token",
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
       .then((response) => {
-        setUser(response.data.user); 
+        setUser(response.data.user);
         const userId = response.data.user._id;
 
         // Get liked books
         axios
-        .get(`http://localhost:3001/users/${userId}/liked-books`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-        .then((res) => {
-          setLikedBooks(res.data.likedBooks);
+          .get(`http://localhost:3001/users/${userId}/liked-books`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          .then((res) => {
+            setLikedBooks(res.data.likedBooks);
           })
           .catch(() => {
             setError("Failed to fetch liked books");
@@ -46,29 +48,82 @@ const Dashboard = () => {
       });
   }, [navigate]);
 
+  // Delete liked Book function
+  const handleDelete = async (bookId) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("User not logged in");
+      return;
+    }
+    try {
+      await axios.delete(`http://localhost:3001/like-book/${bookId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setLikedBooks((prevBooks) =>
+        prevBooks.filter((book) => book.bookId !== bookId)
+      );
+      console.log("Book deleted successfully");
+    } catch (error) {
+      console.error("Error deleting book:", error);
+    }
+  };
+
   return (
     <div>
-      <h2>Your Liked Books</h2>
+      {user && <h2>Welcome, {user.name}!</h2>}
+      <h3>Your Liked Books</h3>
       {error && <p>{error}</p>}
-      <div className="liked-books-list">
-        {likedBooks.length === 0 ? (
-          <p>No liked books found.</p>
-        ) : (
-          likedBooks.map((book) => (
-            <div key={book.bookId} className="book-card">
+      {likedBooks.length === 0 ? (
+        <p>No liked books found.</p>
+      ) : (
+        <div className="liked-books-grid">
+          {likedBooks.map((book) => (
+            <div 
+              key={book.bookId} 
+              className="book-card" 
+              onClick={() => navigate(`/shared-book/${book.bookId}`)}
+              style={{ cursor: "pointer" }}
+            >
               <img src={book.imageUrl} alt={book.title} />
               <h3>{book.title}</h3>
-              <p>{book.authors}</p>
+              <p>{book.authors.join(", ")}</p>
               <p>{book.description}</p>
-              {/* Add options to share or delete  */}
-              <button>Share</button>
-              <button>Delete</button>
+              <div className="card-buttons">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(book.bookId);
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+              <div className="download-options">
+                {book.formats?.epub && (
+                  <a
+                    href={book.formats.epub}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Download EPUB
+                  </a>
+                )}
+                {book.formats?.html && (
+                  <a
+                    href={book.formats.html}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Read HTML
+                  </a>
+                )}
+              </div>
             </div>
-          ))
-        )}
-      </div>
-
-      {/* Add a link to Home */}
+          ))}
+        </div>
+      )}
       <Link to="/" className="home-link">Go back to Home</Link>
     </div>
   );

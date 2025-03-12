@@ -130,6 +130,54 @@ app.get("/users/:userId/liked-books", authenticateToken, async (req, res) => {
   }
 });
 
+// delete saved book 
+app.delete("/like-book/:id", authenticateToken, async (req, res) => {
+  const bookId = req.params.id;
+  const userId = req.user._id; // Token must include _id
+
+  try {
+    // Find the user by ID
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.json({ error: "User not found" });
+    }
+
+    // Remove the liked book's ObjectId from the user's likedBooks array
+    user.likedBooks = user.likedBooks.filter(
+      (likedBookId) => likedBookId.toString() !== bookId
+    );
+    await user.save();
+
+    // Delete the liked book document itself
+    await LikedBook.findByIdAndDelete(bookId);
+
+    res.json({ message: "Liked book deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.json({ error: "Failed to delete liked book" });
+  }
+});
+// Public endpoint to get details of a shared liked book
+app.get("/shared-book/:id", async (req, res) => {
+  const bookId = req.params.id;
+  
+  try {
+    const book = await LikedBook.findById(bookId);
+    if (!book) {
+      return res.json({ error: "Book not found" });
+    }
+    // return only public details:
+    res.json({ book });
+  } catch (error) {
+    console.error(error);
+    res.json({ error: "Failed to load book details" });
+  }
+});
+
+
+
+
+
 
 // Fix __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);

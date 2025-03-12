@@ -6,11 +6,9 @@
   white-space: normal; /* Allows text to wrap properly */
   max-width: 100%; /* Prevents text from spilling outside */
 }
-/* Make inputs and buttons mobile-friendly */
 
   
  
-  
   .book-card {
     min-width: 250px;
     flex-shrink: 0;
@@ -35,4 +33,43 @@
       padding: 15px;
     }
   }
-  
+  /* Grid container for liked books */
+.liked-books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+  padding: 10px;
+}
+
+/* Styling for each book card */
+.book-card {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Button styling within cards */
+.card-buttons {
+  margin-top: 10px;
+}
+.card-buttons button {
+  margin: 5px;
+}
+
+/* Styling for download/read links */
+.download-options a {
+  display: inline-block;
+  margin: 5px;
+  text-decoration: none;
+  color: blue;
+}
+
+/* Mobile-friendly adjustments */
+@media (max-width: 600px) {
+  .liked-books-grid {
+    grid-template-columns: 1fr;
+  }
+}

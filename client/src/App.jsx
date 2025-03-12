@@ -1,26 +1,23 @@
-// src/App.jsx
+// client/src/App.jsx
 import React from 'react';
-import './App.css';
-import Registration from './Registration';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './Home';
 import Login from './Login';
+import Registration from './Registration';
 import Dashboard from './Dashboard';
-import PrivateRoute from './PrivateRoute'; 
+import PrivateRoute from './PrivateRoute';
+import PublicBookDetail from './PublicBookDetail'; // public detail page
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path='/' element={<Home/>} />
+        <Route path='/' element={<Home />} />
         <Route path="/register" element={<Registration />} />
         <Route path="/login" element={<Login />} />
-        
-        {/* Protect the Dashboard route */}
-        <Route 
-          path="/dashboard" 
-          element={<PrivateRoute element={<Dashboard />} />} 
-        />
+        <Route path="/dashboard" element={<PrivateRoute element={<Dashboard />} />} />
+        {/* Public detail page */}
+        <Route path="/shared-book/:id" element={<PublicBookDetail />} />
       </Routes>
     </BrowserRouter>
   );
