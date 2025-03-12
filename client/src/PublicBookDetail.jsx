@@ -27,7 +27,8 @@ const PublicBookDetail = () => {
 
   const handleShare = () => {
     if (!book) return;
-    const detailURL = window.location.href;
+    // url with domain and  book ID
+    const detailURL = `${window.location.origin}/shared-book/${book.id}`;
     const shareData = {
       title: book.title,
       text: `Check out this book: ${book.title} by ${book.authors.map(a => a.name).join(", ")}`,
@@ -54,10 +55,11 @@ const PublicBookDetail = () => {
   if (error) return <p>{error}</p>;
   if (!book) return <p>Loading...</p>;
 
-  // Use the "summaries" array as description, if available.
-  const description = book.summaries && book.summaries.length > 0 
-    ? book.summaries.join("\n\n")
-    : "No description available";
+  //  use summaries array as description
+  const description =
+    book.summaries && book.summaries.length > 0 
+      ? book.summaries.join("\n\n")
+      : "No description available";
 
   return (
     <div className="book-detail">
