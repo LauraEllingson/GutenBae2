@@ -15,7 +15,11 @@ import LikedBook from './models/LikedBooks.js'; // Import LikedBook model
 const app = express();
 app.use(express.json());
 app.use(cors());
-
+// Allow requests from frontend
+app.use(cors({
+  origin: ["https://gutenbae2.onrender.com", "http://localhost:5173"], 
+  credentials: true
+}));
 // MongoDB Connection using environment variable
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("Connected to MongoDB"))

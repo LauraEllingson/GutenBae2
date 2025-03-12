@@ -21,7 +21,7 @@ const Dashboard = () => {
     // Verify token with backend
     axios
       .post(
-        "http://localhost:3001/verify-token",
+        "https://gutenbae2.onrender.com/verify-token",
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       )
@@ -31,7 +31,7 @@ const Dashboard = () => {
 
         // Get liked books
         axios
-          .get(`http://localhost:3001/users/${userId}/liked-books`, {
+          .get(`https://gutenbae2.onrender.com/users/${userId}/liked-books`, {
             headers: { Authorization: `Bearer ${token}` },
           })
           .then((res) => {
@@ -56,7 +56,7 @@ const Dashboard = () => {
       return;
     }
     try {
-      await axios.delete(`http://localhost:3001/like-book/${bookId}`, {
+      await axios.delete(`https://gutenbae2.onrender.com/like-book/${bookId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setLikedBooks((prevBooks) =>

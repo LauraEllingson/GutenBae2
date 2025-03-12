@@ -102,7 +102,7 @@ const Home = () => {
 
     try {
       await axios.post(
-        "http://localhost:3001/like-book",
+        "https://gutenbae2.onrender.com/like-book",
         likedBookData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
