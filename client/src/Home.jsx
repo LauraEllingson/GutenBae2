@@ -259,7 +259,9 @@ const Home = () => {
                     <img src={book.volumeInfo.imageLinks.thumbnail} alt="Book thumbnail" style={{ maxWidth: '100px' }} />
                   )}
                   <p>
-                    <a href={book.volumeInfo?.infoLink} target="_blank" rel="noopener noreferrer">
+                    <a href={book.volumeInfo?.infoLink} target="_blank" rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}>
+
                       Read More
                     </a>
                   </p>
