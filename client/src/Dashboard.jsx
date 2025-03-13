@@ -9,6 +9,14 @@ const Dashboard = () => {
   const [likedBooks, setLikedBooks] = useState([]);
   const [error, setError] = useState(null);
 
+  const cleanTitle = (title) => {
+    return title.replace(/\$b/g, "");
+  };
+
+  const capitalizeTitle = (title) => {
+    return title.replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -21,7 +29,7 @@ const Dashboard = () => {
     // Verify token with backend
     axios
       .post(
-        "https://gutenbae2.onrender.com/verify-token", //fixed mobile login issues
+        "https://gutenbae2.onrender.com/verify-token",
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       )
@@ -48,8 +56,15 @@ const Dashboard = () => {
       });
   }, [navigate]);
 
-  // Delete liked Book function
+  // Delete liked Book  confirmation prompt
   const handleDelete = async (bookId) => {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this liked book? This action cannot be undone."
+      )
+    ) {
+      return;
+    }
     const token = localStorage.getItem("token");
     if (!token) {
       console.error("User not logged in");
@@ -60,7 +75,7 @@ const Dashboard = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setLikedBooks((prevBooks) =>
-        prevBooks.filter((book) => book.bookId !== bookId)
+        prevBooks.filter((book) => book._id !== bookId)
       );
       console.log("Book deleted successfully");
     } catch (error) {
@@ -68,8 +83,23 @@ const Dashboard = () => {
     }
   };
 
+  // Share function to copy share URL to clipboard
+  const handleShare = async (bookId) => {
+    const shareUrl = `${window.location.origin}/shared-book/${bookId}`;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      alert("Share link copied to clipboard!");
+    } catch (error) {
+      console.error("Error copying share link:", error);
+      alert("Failed to copy share link");
+    }
+  };
+
   return (
     <div>
+      <Link to="/" className="home-link">
+        Back to Home
+      </Link>
       {user && <h2>Welcome, {user.name}!</h2>}
       <h3>Your Liked Books</h3>
       {error && <p>{error}</p>}
@@ -78,52 +108,70 @@ const Dashboard = () => {
       ) : (
         <div className="liked-books-grid">
           {likedBooks.map((book) => (
-            <div 
-              key={book.bookId} 
-              className="book-card" 
+            <div
+              key={book._id}
+              className="book-container"
               onClick={() => navigate(`/shared-book/${book.bookId}`)}
               style={{ cursor: "pointer" }}
             >
-              <img src={book.imageUrl} alt={book.title} />
-              <h3>{book.title}</h3>
-              <p>{book.authors.join(", ")}</p>
-              <div className="card-buttons">
+              <div className="book-card">
                 <button
+                  className="delete-button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDelete(book.bookId);
+                    handleDelete(book._id);
                   }}
                 >
-                  Delete
+                  X
                 </button>
+                <div className="book-image">
+                  <img src={book.imageUrl} alt={book.title} />
+                </div>
               </div>
-              <div className="download-options">
-                {book.formats?.epub && (
-                  <a
-                    href={book.formats.epub}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    Download EPUB
-                  </a>
-                )}
-                {book.formats?.html && (
-                  <a
-                    href={book.formats.html}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    Read HTML
-                  </a>
-                )}
+              <div className="book-info">
+                <h3 className="book-title">
+                  {capitalizeTitle(cleanTitle(book.title))}
+                </h3>
+                <p className="book-author">{book.authors.join(", ")}</p>
+                <div className="download-options">
+                  {book.formats?.epub && (
+                    <a
+                      href={book.formats.epub}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      Download EPUB
+                    </a>
+                  )}
+                  {book.formats?.html && (
+                    <a
+                      href={book.formats.html}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      Read HTML
+                    </a>
+                  )}
+                </div>
+                <button
+                  className="share-button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleShare(book.bookId);
+                  }}
+                >
+                  Share
+                </button>
               </div>
             </div>
           ))}
         </div>
       )}
-      <Link to="/" className="home-link">Go back to Home</Link>
+      <Link to="/" className="home-link">
+        Go back to Home
+      </Link>
     </div>
   );
 };

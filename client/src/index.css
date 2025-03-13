@@ -1,65 +1,86 @@
-.book-title,
 .book-author,
 .book-topic {
-  word-wrap: break-word; /* Ensures long words break */
+  word-wrap: break-word; /* long words break */
   overflow-wrap: break-word;
-  white-space: normal; /* Allows text to wrap properly */
-  max-width: 100%; /* Prevents text from spilling outside */
+  white-space: normal; 
+  max-width: 100%; 
 }
 
-  
- 
-  .book-card {
-    min-width: 250px;
-    flex-shrink: 0;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 10px;
-    text-align: center;
-  }
-  
-  @media (max-width: 768px) {
-    .slider-container {
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-  
-    .book-card {
-      width: 90%;
-    }
-  
-    .book-details {
-      width: 95%;
-      padding: 15px;
-    }
-  }
-  /* Grid container for liked books */
-.liked-books-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 15px;
-  padding: 10px;
+.book-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Limit to three lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: normal;
+  word-wrap: break-word; 
+  text-overflow: clip; 
 }
 
-/* Styling for each book card */
+
 .book-card {
+  position: relative;
+  width: 100%;
+  max-width: 220px;  
+  min-width: 180px;
+  height: 350px;      
   border: 1px solid #ccc;
   border-radius: 8px;
-  padding: 10px;
-  text-align: center;
+  overflow: hidden;
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Button styling within cards */
-.card-buttons {
-  margin-top: 10px;
-}
-.card-buttons button {
-  margin: 5px;
+/* Book image container */
+.book-image {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
-/* Styling for download/read links */
+.book-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Delete button overlay */
+.delete-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 16px;
+  line-height: 24px;
+  text-align: center;
+  cursor: pointer;
+  z-index: 3;
+}
+
+.delete-button:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+/* Book info  below the image card */
+.book-info {
+  padding: 8px;
+  text-align: center;
+  max-width: 220px; /* Match the new card width */
+  margin: 0 auto;
+}
+
+/* Download options styling */
+.download-options {
+  margin-top: 5px;
+  background: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  padding: 5px 0;
+}
+
 .download-options a {
   display: inline-block;
   margin: 5px;
@@ -67,9 +88,17 @@
   color: blue;
 }
 
-/* Mobile-friendly adjustments */
+/* Grid container for liked books */
+.liked-books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  padding: 5px;
+}
+
+/* Mobile  */
 @media (max-width: 600px) {
   .liked-books-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 }

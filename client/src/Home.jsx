@@ -13,6 +13,14 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
 
+  const cleanTitle = (title) => {
+    return title.replace(/\$b/g, "");
+  };
+  const capitalizeTitle = (title) => {
+    return title.replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+  
+
   // Check if user is logged in
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -132,7 +140,7 @@ const Home = () => {
         )}
       </div>
 
-      <h1>Welcome to GutenBae!</h1>
+      <h1>GutenBae</h1>
       <div>
         <input 
           type="text" 
@@ -147,9 +155,9 @@ const Home = () => {
         </button>
       </div>
 
-      {/* Gutendex Results (Scrollable Cards) */}
+      {/* Gutendex Results (Cards) */}
       <div style={{ width: '100%', marginTop: '20px' }}>
-        <h2>Free Books (Gutendex)</h2>
+        <h2>Free Books from Gutendex</h2>
         <div style={{
           display: 'flex',
           overflowX: 'auto',
@@ -167,9 +175,10 @@ const Home = () => {
                     onClick={() => navigate(`/shared-book/${book.id}`)}
                     style={{ cursor: "pointer", minWidth: '250px', minHeight: '300px', border: '1px solid #ccc', borderRadius: '8px', padding: '10px', textAlign: 'center' }}
                   >
-                    <h3 className="book-title">{book.title}</h3>
+              <h3 className="book-title">{capitalizeTitle(cleanTitle(book.title))}</h3>
+
                     <p className="book-author">
-                      <strong>Author(s):</strong> {book.authors?.map(a => a.name).join(', ') || 'Unknown'}
+                      <strong>Author:</strong> {book.authors?.map(a => a.name).join(', ') || 'Unknown'}
                     </p>
                     {book.subjects?.length > 0 && (
                       <p className="book-topic"><strong>Topic:</strong> {book.subjects[1]}</p>
@@ -215,7 +224,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Google Books Results (Scrollable Cards) */}
+      {/* Google Books Results (cards) */}
       <div style={{ width: '100%', marginTop: '20px' }}>
         <h2>Google Books Results</h2>
         <div style={{
@@ -244,7 +253,7 @@ const Home = () => {
                 >
                   <h3 className="book-title">{book.volumeInfo?.title || 'No title available'}</h3>
                   <p className="book-author">
-                    <strong>Author(s):</strong> {book.volumeInfo?.authors?.join(', ') || 'Unknown'}
+                    <strong>Author:</strong> {book.volumeInfo?.authors?.join(', ') || 'Unknown'}
                   </p>
                   {book.volumeInfo?.imageLinks?.thumbnail && (
                     <img src={book.volumeInfo.imageLinks.thumbnail} alt="Book thumbnail" style={{ maxWidth: '100px' }} />
