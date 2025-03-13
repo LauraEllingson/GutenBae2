@@ -4,9 +4,11 @@
   overflow-wrap: break-word;
   white-space: normal; 
   max-width: 100%; 
+  text-align: left;
 }
 
 .book-title {
+  font-size: 15px;
   display: -webkit-box;
   -webkit-line-clamp: 2; /* Limit to three lines */
   -webkit-box-orient: vertical;
@@ -14,6 +16,7 @@
   white-space: normal;
   word-wrap: break-word; 
   text-overflow: clip; 
+  text-align: left;
 }
 
 
@@ -28,6 +31,7 @@
   overflow: hidden;
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: left;
 }
 
 /* Book image container */
@@ -56,7 +60,7 @@
   height: 24px;
   font-size: 16px;
   line-height: 24px;
-  text-align: center;
+  text-align: left;
   cursor: pointer;
   z-index: 3;
 }
@@ -68,25 +72,19 @@
 /* Book info  below the image card */
 .book-info {
   padding: 8px;
-  text-align: center;
+  text-align: left;
   max-width: 220px; /* Match the new card width */
   margin: 0 auto;
 }
 
-/* Download options styling */
 .download-options {
-  margin-top: 5px;
+  margin-top: 2px;
   background: rgba(255, 255, 255, 0.8);
-  text-align: center;
-  padding: 5px 0;
+  display: flex;
+  justify-content: left;
+  gap: 10px; /* Adjust gap as needed */
 }
 
-.download-options a {
-  display: inline-block;
-  margin: 5px;
-  text-decoration: none;
-  color: blue;
-}
 
 /* Grid container for liked books */
 .liked-books-grid {

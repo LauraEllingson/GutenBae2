@@ -175,7 +175,10 @@ const Home = () => {
                     onClick={() => navigate(`/shared-book/${book.id}`)}
                     style={{ cursor: "pointer", minWidth: '250px', minHeight: '300px', border: '1px solid #ccc', borderRadius: '8px', padding: '10px', textAlign: 'center' }}
                   >
-              <h3 className="book-title">{capitalizeTitle(cleanTitle(book.title))}</h3>
+              
+                    {book.formats?.['image/jpeg'] && (
+                      <img src={book.formats['image/jpeg']} alt="Book thumbnail" style={{ maxWidth: '100px' }} />
+                    )}<h3 className="book-title">{capitalizeTitle(cleanTitle(book.title))}</h3>
 
                     <p className="book-author">
                       <strong>Author:</strong> {book.authors?.map(a => a.name).join(', ') || 'Unknown'}
@@ -183,11 +186,8 @@ const Home = () => {
                     {book.subjects?.length > 0 && (
                       <p className="book-topic"><strong>Topic:</strong> {book.subjects[1]}</p>
                     )}
-                    {book.formats?.['image/jpeg'] && (
-                      <img src={book.formats['image/jpeg']} alt="Book thumbnail" style={{ maxWidth: '100px' }} />
-                    )}
                     <p>
-                      <strong>Download:</strong>
+                    
                       {book.formats?.['application/epub+zip'] && (
                         <a 
                           href={book.formats['application/epub+zip']} 
