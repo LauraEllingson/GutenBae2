@@ -121,7 +121,7 @@ const PublicBookDetail = () => {
   {" | "}
   
   <Link to="/" className="home-link">
-    Go Back Home
+     Home
   </Link>
 
 </p>
