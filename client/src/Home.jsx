@@ -170,6 +170,7 @@ const Home = () => {
               freeResults.map((book, index) => (
                 book.title && (
                   <div 
+                  
                     key={index} 
                     className="book-card" 
                     onClick={() => navigate(`/shared-book/${book.id}`)}
@@ -188,34 +189,55 @@ const Home = () => {
                     )}
                     <p>
                     
-                      {book.formats?.['application/epub+zip'] && (
-                        <a 
-                          href={book.formats['application/epub+zip']} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                        > EPUB</a>
-                      )} |
-                      {book.formats?.['application/x-mobipocket-ebook'] && (
-                        <a 
-                          href={book.formats['application/x-mobipocket-ebook']} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                        > Kindle</a>
-                      )} |
-                      {book.formats?.['text/html'] && (
-                        <a 
-                          href={book.formats['text/html']} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                        > HTML</a>
-                      )}
-                      <button onClick={(e) => {
-                        e.stopPropagation();
-                        handleLike(book);
-                      }}>❤️</button>
+                    <p className="download-links">
+  {book.formats?.["application/epub+zip"] && (
+    <a 
+      href={book.formats["application/epub+zip"]} 
+      target="_blank" 
+      rel="noopener noreferrer"
+      onClick={(e) => e.stopPropagation()}
+    >
+      EPUB
+    </a>
+  )}
+  {book.formats?.["application/x-mobipocket-ebook"] && (
+    <>
+      {" | "}
+      <a 
+        href={book.formats["application/x-mobipocket-ebook"]} 
+        target="_blank" 
+        rel="noopener noreferrer"
+        onClick={(e) => e.stopPropagation()}
+      >
+        Kindle
+      </a>
+    </>
+  )}
+  {book.formats?.["text/html"] && (
+    <>
+      {" | "}
+      <a 
+        href={book.formats["text/html"]} 
+        target="_blank" 
+        rel="noopener noreferrer"
+        onClick={(e) => e.stopPropagation()}
+      >
+        HTML
+      </a>
+    </>
+  )}
+</p>
+
+<button 
+  className="like-button" 
+  onClick={(e) => {
+    e.stopPropagation();
+    handleLike(book);
+  }}
+>
+  ❤️
+</button>
+
                     </p>
                   </div>
                 )

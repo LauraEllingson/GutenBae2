@@ -26,7 +26,6 @@ const Dashboard = () => {
       return;
     }
 
-    // Verify token with backend
     axios
       .post(
         "https://gutenbae2.onrender.com/verify-token",
@@ -37,7 +36,6 @@ const Dashboard = () => {
         setUser(response.data.user);
         const userId = response.data.user._id;
 
-        // Get liked books
         axios
           .get(`https://gutenbae2.onrender.com/users/${userId}/liked-books`, {
             headers: { Authorization: `Bearer ${token}` },
@@ -56,7 +54,6 @@ const Dashboard = () => {
       });
   }, [navigate]);
 
-  // Delete liked Book  confirmation prompt
   const handleDelete = async (bookId) => {
     if (
       !window.confirm(
@@ -65,6 +62,7 @@ const Dashboard = () => {
     ) {
       return;
     }
+
     const token = localStorage.getItem("token");
     if (!token) {
       console.error("User not logged in");
@@ -83,7 +81,6 @@ const Dashboard = () => {
     }
   };
 
-  // Share function to copy share URL to clipboard
   const handleShare = async (bookId) => {
     const shareUrl = `${window.location.origin}/shared-book/${bookId}`;
     try {
@@ -108,15 +105,15 @@ const Dashboard = () => {
       ) : (
         <div className="liked-books-grid">
           {likedBooks.map((book) => (
-            <div
-              key={book._id}
-              className="book-container"
+            <div 
+              key={book._id} 
+              className="book-container" 
               onClick={() => navigate(`/shared-book/${book.bookId}`)}
               style={{ cursor: "pointer" }}
             >
               <div className="book-card">
-                <button
-                  className="delete-button"
+                <button 
+                  className="delete-button" 
                   onClick={(e) => {
                     e.stopPropagation();
                     handleDelete(book._id);
@@ -128,43 +125,9 @@ const Dashboard = () => {
                   <img src={book.imageUrl} alt={book.title} />
                 </div>
               </div>
-              <div className="book-info">
-                <h3 className="book-title">
-                  {capitalizeTitle(cleanTitle(book.title))}
-                </h3>
-                <p className="book-author">{book.authors.join(", ")}</p>
-                <div className="download-options">
-                  {book.formats?.epub && (
-                    <a
-                      href={book.formats.epub}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      Download EPUB
-                    </a>
-                  )}
-                  {book.formats?.html && (
-                    <a
-                      href={book.formats.html}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      Read HTML
-                    </a>
-                  )}
-                </div>
-                <button
-                  className="share-button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleShare(book.bookId);
-                  }}
-                >
-                  Share
-                </button>
-              </div>
+              
+                
+           
             </div>
           ))}
         </div>
