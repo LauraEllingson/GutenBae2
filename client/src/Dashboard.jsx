@@ -169,9 +169,6 @@ const Dashboard = () => {
           ))}
         </div>
       )}
-      <Link to="/" className="home-link">
-        Go back to Home
-      </Link>
     </div>
   );
 };

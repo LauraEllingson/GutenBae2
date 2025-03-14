@@ -72,34 +72,57 @@ const PublicBookDetail = () => {
         <p>{description}</p>
       </div>
       
-      <div className="download-options">
-        {book.formats?.["application/epub+zip"] && (
-          <a
-            href={book.formats["application/epub+zip"]}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Download EPUB
-          </a>
-        )}
-        {book.formats?.["text/html"] && (
-          <a
-            href={book.formats["text/html"]}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read in Browser
-          </a>
-        )}
-      </div>
-      
-      <div className="share-section">
-        <button onClick={handleShare}>Share this Book</button>
-      </div>
-      
-      <Link to="/">Go back to Home</Link>
-    </div>
+      <p className="download-options">
+  {book.formats?.["application/epub+zip"] && (
+    <a 
+      href={book.formats["application/epub+zip"]} 
+      target="_blank" 
+      rel="noopener noreferrer"
+      onClick={(e) => e.stopPropagation()}
+    >
+      EPUB
+    </a>
+  )}
+  {book.formats?.["application/x-mobipocket-ebook"] && book.formats?.["application/epub+zip"] && " | "}
+  {book.formats?.["application/x-mobipocket-ebook"] && (
+    <a 
+      href={book.formats["application/x-mobipocket-ebook"]} 
+      target="_blank" 
+      rel="noopener noreferrer"
+      onClick={(e) => e.stopPropagation()}
+    >
+      Kindle
+    </a>
+  )}
+  {book.formats?.["text/html"] && (book.formats?.["application/epub+zip"] || book.formats?.["application/x-mobipocket-ebook"]) && " | "}
+  {book.formats?.["text/html"] && (
+    <a 
+      href={book.formats["text/html"]} 
+      target="_blank" 
+      rel="noopener noreferrer"
+      onClick={(e) => e.stopPropagation()}
+    >
+      HTML
+    </a>
+    
+  )}
+  
+  {(book.formats?.["application/epub+zip"] || book.formats?.["application/x-mobipocket-ebook"] || book.formats?.["text/html"]) && " | "}
+  <a 
+    href="#" 
+    className="share-link" 
+    onClick={(e) => {
+      e.stopPropagation();
+      handleShare(book.bookId);
+    }}
+  >
+    Share
+  </a>
+</p>
+</div>
+
   );
-};
+
+  }
 
 export default PublicBookDetail;
