@@ -271,6 +271,7 @@ const Home = () => {
                   }}
                   //  Google Books info link to new tab:
                   onClick={() => window.open(book.volumeInfo?.infoLink, "_blank")}
+                  
                 >
                   <h3 className="book-title">{book.volumeInfo?.title || 'No title available'}</h3>
                   <p className="book-author">
@@ -282,7 +283,6 @@ const Home = () => {
                   <p>
                     <a href={book.volumeInfo?.infoLink} target="_blank" rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}>
-
                       Read More
                     </a>
                   </p>
