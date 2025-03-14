@@ -9,13 +9,8 @@ const Dashboard = () => {
   const [likedBooks, setLikedBooks] = useState([]);
   const [error, setError] = useState(null);
 
-  const cleanTitle = (title) => {
-    return title.replace(/\$b/g, "");
-  };
-
-  const capitalizeTitle = (title) => {
-    return title.replace(/\b\w/g, (char) => char.toUpperCase());
-  };
+  const cleanTitle = (title) => title.replace(/\$b/g, "");
+  const capitalizeTitle = (title) => title.replace(/\b\w/g, (char) => char.toUpperCase());
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -55,26 +50,18 @@ const Dashboard = () => {
   }, [navigate]);
 
   const handleDelete = async (bookId) => {
-    if (
-      !window.confirm(
-        "Are you sure you want to delete this liked book? This action cannot be undone."
-      )
-    ) {
+    if (!window.confirm("Are you sure you want to delete this liked book? This action cannot be undone.")) {
       return;
     }
 
     const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("User not logged in");
-      return;
-    }
+    if (!token) return console.error("User not logged in");
+
     try {
       await axios.delete(`https://gutenbae2.onrender.com/like-book/${bookId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setLikedBooks((prevBooks) =>
-        prevBooks.filter((book) => book._id !== bookId)
-      );
+      setLikedBooks((prevBooks) => prevBooks.filter((book) => book._id !== bookId));
       console.log("Book deleted successfully");
     } catch (error) {
       console.error("Error deleting book:", error);
@@ -94,9 +81,7 @@ const Dashboard = () => {
 
   return (
     <div>
-      <Link to="/" className="home-link">
-        Back to Home
-      </Link>
+      <Link to="/" className="home-link">Back to Home</Link>
       {user && <h2>Welcome, {user.name}!</h2>}
       <h3>Your Liked Books</h3>
       {error && <p>{error}</p>}
@@ -107,27 +92,86 @@ const Dashboard = () => {
           {likedBooks.map((book) => (
             <div 
               key={book._id} 
-              className="book-container" 
+              className="book-card" 
               onClick={() => navigate(`/shared-book/${book.bookId}`)}
-              style={{ cursor: "pointer" }}
             >
-              <div className="book-card">
+              {/* Delete Button */}
+              <button 
+                className="delete-button" 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(book._id);
+                }}
+              >
+                X
+              </button>
+
+              {/* Book Cover */}
+              <div className="book-image">
+                <img src={book.imageUrl} alt={book.title} />
+              </div>
+
+              {/* Book Details (Reveal on Hover) */}
+              <div className="book-details">
+                <h3 className="book-title">{capitalizeTitle(cleanTitle(book.title))}</h3>
+                <p className="book-author"><strong>Author:</strong> {book.authors?.join(", ") || "Unknown"}</p>
+                
+                <p className="download-options">
+  {book.formats && Object.keys(book.formats).length > 0 ? (
+    <>
+      {book.formats["application/epub+zip"] && (
+        <a 
+          href={book.formats["application/epub+zip"]} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+        >
+          EPUB
+        </a>
+      )}
+      {book.formats["application/x-mobipocket-ebook"] && (
+        <>
+          {" | "}
+          <a 
+            href={book.formats["application/x-mobipocket-ebook"]} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            Kindle
+          </a>
+        </>
+      )}
+      {book.formats["text/html"] && (
+        <>
+          {" | "}
+          <a 
+            href={book.formats["text/html"]} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            HTML
+          </a>
+        </>
+      )}
+    </>
+  ) : (
+    <p>Click for download options</p>
+  )}
+</p>
+
+                {/* Share Button */}
                 <button 
-                  className="delete-button" 
+                  className="share-button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDelete(book._id);
+                    handleShare(book.bookId);
                   }}
                 >
-                  X
+                  Share
                 </button>
-                <div className="book-image">
-                  <img src={book.imageUrl} alt={book.title} />
-                </div>
               </div>
-              
-                
-           
             </div>
           ))}
         </div>

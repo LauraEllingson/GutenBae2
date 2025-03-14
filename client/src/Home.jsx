@@ -101,7 +101,7 @@ const Home = () => {
       description: book.summaries && book.summaries.length > 0 
                     ? book.summaries.join("\n\n")
                     : "No description available",
-      formats: book.formats,
+      formats: book.formats || {},
     };
 
     try {
