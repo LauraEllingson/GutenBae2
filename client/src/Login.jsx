@@ -16,7 +16,7 @@ const Login = () => {
     }
 
     axios
-      .post("http://localhost:3001/login", { email, password })
+      .post("https://gutenbae2.onrender.com/login", { email, password })
       .then((response) => {
         // Save token in local storage
         localStorage.setItem("token", response.data.token);

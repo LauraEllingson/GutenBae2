@@ -14,7 +14,7 @@ const Registration = () => {
       return;
     }
 
-    axios.post('http://localhost:3001/register', { name, email, password })
+    axios.post('https://gutenbae2.onrender.com/register', { name, email, password })
       .then(() => {
         alert("Registration Successful!");
         window.location.href = "/login"; 

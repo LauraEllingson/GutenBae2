@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './index.css';
@@ -13,12 +12,18 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
 
-  // Check if user is logged in
+  const cleanTitle = (title) => {
+    return title.replace(/\$b/g, "");
+  };
+  const capitalizeTitle = (title) => {
+    return title.replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     setLoggedIn(!!token);
   }, []);
-  
+
   // Load last search 
   useEffect(() => {
     const savedQuery = localStorage.getItem("lastQuery");
@@ -80,7 +85,6 @@ const Home = () => {
     }
   };
 
-  // like a book 
   const handleLike = async (book) => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -97,12 +101,12 @@ const Home = () => {
       description: book.summaries && book.summaries.length > 0 
                     ? book.summaries.join("\n\n")
                     : "No description available",
-      formats: book.formats,
+      formats: book.formats || {},
     };
 
     try {
       await axios.post(
-        "http://localhost:3001/like-book",
+        "https://gutenbae2.onrender.com/like-book",
         likedBookData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -111,10 +115,14 @@ const Home = () => {
       alert("Failed to like book: " + (error.response?.data.error || error.message));
     }
   };
+  
+
+  
+
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-      {/* Top Navigation */}
+      {/* Navigation */}
       <div style={{ width: '100%', textAlign: 'right', marginBottom: '20px' }}>
         {loggedIn ? (
           <>
@@ -132,7 +140,7 @@ const Home = () => {
         )}
       </div>
 
-      <h1>Welcome to GutenBae!</h1>
+      <h1>GutenBae</h1>
       <div>
         <input 
           type="text" 
@@ -147,9 +155,9 @@ const Home = () => {
         </button>
       </div>
 
-      {/* Gutendex Results (Scrollable Cards) */}
+      {/* Gutendex Results (Cards) */}
       <div style={{ width: '100%', marginTop: '20px' }}>
-        <h2>Free Books (Gutendex)</h2>
+        <h2>Free Books from Gutendex</h2>
         <div style={{
           display: 'flex',
           overflowX: 'auto',
@@ -157,65 +165,87 @@ const Home = () => {
           padding: '10px',
           whiteSpace: 'nowrap'
         }}>
-          {isLoading ? <p>Searching...</p> : (
-            freeResults.length === 0 ? <p>No results found.</p> :
-              freeResults.map((book, index) => (
-                book.title && (
-                  <div 
-                    key={index} 
-                    className="book-card" 
-                    onClick={() => navigate(`/shared-book/${book.id}`)}
+        {isLoading ? <p>Searching...</p> : (
+          freeResults.length === 0 ? <p>No results found.</p> :
+            freeResults.map((book, index) => (
+              book.title && (
+                <div 
+                  key={index} 
+                  className="book-card" 
+                  
+                  onClick={() => navigate(`/shared-book/${book.id}`)}
                     style={{ cursor: "pointer", minWidth: '250px', minHeight: '300px', border: '1px solid #ccc', borderRadius: '8px', padding: '10px', textAlign: 'center' }}
+                >
+                  {/* Like Button */}
+                  <button 
+                    className="like-button" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleLike(book);
+                    }}
                   >
-                    <h3 className="book-title">{book.title}</h3>
-                    <p className="book-author">
-                      <strong>Author(s):</strong> {book.authors?.map(a => a.name).join(', ') || 'Unknown'}
-                    </p>
-                    {book.subjects?.length > 0 && (
-                      <p className="book-topic"><strong>Topic:</strong> {book.subjects[1]}</p>
-                    )}
+                    ❤️
+                  </button>
+
+                  {/* Book Cover */}
+                  <div className="book-image">
                     {book.formats?.['image/jpeg'] && (
-                      <img src={book.formats['image/jpeg']} alt="Book thumbnail" style={{ maxWidth: '100px' }} />
+                      <img src={book.formats['image/jpeg']} alt="Book Cover" />
                     )}
-                    <p>
-                      <strong>Download:</strong>
-                      {book.formats?.['application/epub+zip'] && (
+                  </div>
+
+                  {/* Book Details - Visible on Hover */}
+                  <div className="book-details">
+                    <h3 className="book-title">{capitalizeTitle(cleanTitle(book.title))}</h3>
+                    <p className="book-author"><strong>Author:</strong> {book.authors?.map(a => a.name).join(', ') || 'Unknown'}</p>
+                    
+                 
+                    {/* Download Links */}
+                    <p className="download-options">
+                      {book.formats?.["application/epub+zip"] && (
                         <a 
-                          href={book.formats['application/epub+zip']} 
+                          href={book.formats["application/epub+zip"]} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                        > EPUB</a>
-                      )} |
-                      {book.formats?.['application/x-mobipocket-ebook'] && (
-                        <a 
-                          href={book.formats['application/x-mobipocket-ebook']} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                        > Kindle</a>
-                      )} |
-                      {book.formats?.['text/html'] && (
-                        <a 
-                          href={book.formats['text/html']} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                        > HTML</a>
+                        >
+                          EPUB
+                        </a>
                       )}
-                      <button onClick={(e) => {
-                        e.stopPropagation();
-                        handleLike(book);
-                      }}>❤️</button>
+                      {book.formats?.["application/x-mobipocket-ebook"] && book.formats?.["application/epub+zip"] && " | "}
+                      {book.formats?.["application/x-mobipocket-ebook"] && (
+                        <a 
+                          href={book.formats["application/x-mobipocket-ebook"]} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Kindle
+                        </a>
+                      )}
+                      {book.formats?.["text/html"] && (
+                        <>
+                          {" | "}
+                          <a 
+                            href={book.formats["text/html"]} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            HTML
+                          </a>
+                        </>
+                      )}
                     </p>
                   </div>
-                )
-              ))
-          )}
+                </div>
+              )
+            ))
+        )}
         </div>
       </div>
 
-      {/* Google Books Results (Scrollable Cards) */}
+      {/* Google Books Results (cards) */}
       <div style={{ width: '100%', marginTop: '20px' }}>
         <h2>Google Books Results</h2>
         <div style={{
@@ -244,13 +274,15 @@ const Home = () => {
                 >
                   <h3 className="book-title">{book.volumeInfo?.title || 'No title available'}</h3>
                   <p className="book-author">
-                    <strong>Author(s):</strong> {book.volumeInfo?.authors?.join(', ') || 'Unknown'}
+                    <strong>Author:</strong> {book.volumeInfo?.authors?.join(', ') || 'Unknown'}
                   </p>
                   {book.volumeInfo?.imageLinks?.thumbnail && (
                     <img src={book.volumeInfo.imageLinks.thumbnail} alt="Book thumbnail" style={{ maxWidth: '100px' }} />
                   )}
                   <p>
-                    <a href={book.volumeInfo?.infoLink} target="_blank" rel="noopener noreferrer">
+                    <a href={book.volumeInfo?.infoLink} target="_blank" rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}>
+
                       Read More
                     </a>
                   </p>
