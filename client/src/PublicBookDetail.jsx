@@ -118,6 +118,12 @@ const PublicBookDetail = () => {
   >
     Share
   </a>
+  {" | "}
+  
+  <Link to="/" className="home-link">
+    Go Back Home
+  </Link>
+
 </p>
 </div>
 
