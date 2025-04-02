@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './index.css';
 import axios from "axios";
+import logo from './assets/logo.png';
+
 
 const Home = () => {
   const navigate = useNavigate();
@@ -139,21 +141,37 @@ const Home = () => {
           </>
         )}
       </div>
+      <div className="flex flex-col items-center mt-10">
+  <img
+    src={logo}
+    alt="GutenBae logo"
+    className="w-32 h-auto mb-4"
+  />
 
-      <h1>GutenBae</h1>
-      <div>
-        <input 
-          type="text" 
-          placeholder="Enter a keyword" 
-          value={query} 
-          onChange={(e) => setQuery(e.target.value)} 
-          id="search-query"
-          name="search-query"
-        />
-        <button onClick={handleSearch} disabled={isLoading} id="search-button"> 
-          {isLoading ? 'Searching...' : 'Search'}
-        </button>
-      </div>
+
+  {/* Search Bar */}
+  <div className="flex items-center justify-center mt-1 w-full px-2">
+  <input 
+  type="text" 
+  placeholder=" Search by Author, Title or Isbn." 
+  value={query} 
+  onChange={(e) => setQuery(e.target.value)} 
+  onKeyDown={(e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  }}
+  id="search-query"
+  name="search-query"
+  className="w-60 h-12 px-1, pl-1 text-base border border-gray-400 rounded-md text-center text-xs italic placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500"
+  
+/>
+
+      {isLoading ? 'Searching...' : ''}
+
+  </div>
+</div>
+
 
       {/* Gutendex Results (Cards) */}
       <div style={{ width: '100%', marginTop: '20px' }}>
