@@ -6,9 +6,10 @@ import logo from './assets/logo.png';
 import Nav from './Nav';
 
 const truncateTitle = (title) => {
-  const match = title.match(/(.+?[.,:;!?])/);
+  const match = title.match(/(.+?[:;!?—–-])/); // removed period from pattern
   return match ? match[1] : title;
 };
+
 
 
 const Home = () => {
