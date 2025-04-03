@@ -1,60 +1,50 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './index.css';
-import axios from "axios";
+import axios from 'axios';
 import logo from './assets/logo.png';
+import Nav from './Nav';
+
+const truncateTitle = (title) => {
+  const match = title.match(/(.+?[.,:;!?])/);
+  return match ? match[1] : title;
+};
 
 
 const Home = () => {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
-  const [filter, setFilter] = useState('all'); // for future filtering
   const [freeResults, setFreeResults] = useState([]);
   const [googleResults, setGoogleResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
 
-  const cleanTitle = (title) => {
-    return title.replace(/\$b/g, "");
-  };
-  const capitalizeTitle = (title) => {
-    return title.replace(/\b\w/g, (char) => char.toUpperCase());
-  };
+  const cleanTitle = (title) =>
+  title.replace(/\$b/g, '').replace(/[-–—]/g, '');
+
+  const capitalizeTitle = (title) => title.replace(/\b\w/g, (char) => char.toUpperCase());
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     setLoggedIn(!!token);
   }, []);
 
-  // Load last search 
   useEffect(() => {
-    const savedQuery = localStorage.getItem("lastQuery");
-    const savedFreeResults = localStorage.getItem("lastFreeResults");
-    const savedGoogleResults = localStorage.getItem("lastGoogleResults");
-
-    if (savedQuery) {
-      setQuery(savedQuery);
-    }
-    if (savedFreeResults) {
-      setFreeResults(JSON.parse(savedFreeResults));
-    }
-    if (savedGoogleResults) {
-      setGoogleResults(JSON.parse(savedGoogleResults));
-    }
+    const savedQuery = localStorage.getItem('lastQuery');
+    const savedFreeResults = localStorage.getItem('lastFreeResults');
+    const savedGoogleResults = localStorage.getItem('lastGoogleResults');
+    if (savedQuery) setQuery(savedQuery);
+    if (savedFreeResults) setFreeResults(JSON.parse(savedFreeResults));
+    if (savedGoogleResults) setGoogleResults(JSON.parse(savedGoogleResults));
   }, []);
 
-  //  search books
   const handleSearch = async () => {
     if (!query.trim()) {
       setFreeResults([]);
       setGoogleResults([]);
       return;
     }
-
     setIsLoading(true);
-    setFreeResults([]);
-    setGoogleResults([]);
-
     const gutendexApiUrl = `https://gutendex.com/books/?search=${encodeURIComponent(query)}&page_size=10`;
     const googleApiUrl = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}`;
 
@@ -63,253 +53,136 @@ const Home = () => {
         fetch(gutendexApiUrl),
         fetch(googleApiUrl),
       ]);
-
-      if (!gutendexResponse.ok) throw new Error('Gutendex API error');
-      if (!googleResponse.ok) throw new Error('Google Books API error');
+      if (!gutendexResponse.ok || !googleResponse.ok) throw new Error('API error');
 
       const gutendexData = await gutendexResponse.json();
       const googleData = await googleResponse.json();
 
-      const free = gutendexData.results || [];
-      const google = googleData.items || [];
+      setFreeResults(gutendexData.results || []);
+      setGoogleResults(googleData.items || []);
 
-      setFreeResults(free);
-      setGoogleResults(google);
-
-      // Save results to local storage
-      localStorage.setItem("lastQuery", query);
-      localStorage.setItem("lastFreeResults", JSON.stringify(free));
-      localStorage.setItem("lastGoogleResults", JSON.stringify(google));
+      localStorage.setItem('lastQuery', query);
+      localStorage.setItem('lastFreeResults', JSON.stringify(gutendexData.results || []));
+      localStorage.setItem('lastGoogleResults', JSON.stringify(googleData.items || []));
     } catch (error) {
-      console.error('Error fetching data from the API:', error);
+      console.error('Search failed:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleLike = async (book) => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("Please log in to like a book");
-      return;
-    }
+    const token = localStorage.getItem('token');
+    if (!token) return alert('Please log in to like a book');
 
-    // Prep liked book data
     const likedBookData = {
-      bookId: book.id || book.bookId, 
+      bookId: book.id || book.bookId,
       title: book.title,
-      authors: book.authors ? book.authors.map(author => author.name) : ["Unknown"],
-      imageUrl: book.formats?.['image/jpeg'] || "",
-      description: book.summaries && book.summaries.length > 0 
-                    ? book.summaries.join("\n\n")
-                    : "No description available",
+      authors: book.authors ? book.authors.map(a => a.name) : ['Unknown'],
+      imageUrl: book.formats?.['image/jpeg'] || '',
+      description: book.summaries?.join('\n\n') || 'No description available',
       formats: book.formats || {},
     };
 
     try {
-      await axios.post(
-        "https://gutenbae2.onrender.com/like-book",
-        likedBookData,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      alert("Book liked successfully!");
+      await axios.post('https://gutenbae2.onrender.com/like-book', likedBookData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      alert('Book liked!');
     } catch (error) {
-      alert("Failed to like book: " + (error.response?.data.error || error.message));
+      alert('Error liking book');
     }
   };
-  
-
-  
-
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-      {/* Navigation */}
-      <div style={{ width: '100%', textAlign: 'right', marginBottom: '20px' }}>
-        {loggedIn ? (
-          <>
-            <Link to="/dashboard"><button>Dashboard</button></Link>
-            <button onClick={() => {
-              localStorage.removeItem("token");
-              setLoggedIn(false);
-            }}>Logout</button>
-          </>
-        ) : (
-          <>
-            <Link to="/register"><button>Register</button></Link>
-            <Link to="/login"><button>Login</button></Link>
-          </>
-        )}
-      </div>
-      <div className="flex flex-col items-center mt-10">
-  <img
-    src={logo}
-    alt="GutenBae logo"
-    className="w-32 h-auto mb-4"
-  />
-
-
-  {/* Search Bar */}
-  <div className="flex items-center justify-center mt-1 w-full px-2">
-  <input 
-  type="text" 
-  placeholder=" Search by Author, Title or Isbn." 
-  value={query} 
-  onChange={(e) => setQuery(e.target.value)} 
-  onKeyDown={(e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  }}
-  id="search-query"
-  name="search-query"
-  className="w-60 h-12 px-1, pl-1 text-base border border-gray-400 rounded-md text-center text-xs italic placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500"
-  
-/>
-
-      {isLoading ? 'Searching...' : ''}
-
-  </div>
-</div>
-
-
-      {/* Gutendex Results (Cards) */}
-      <div style={{ width: '100%', marginTop: '20px' }}>
-        <h2>Free Books from Gutendex</h2>
-        <div style={{
-          display: 'flex',
-          overflowX: 'auto',
-          gap: '15px',
-          padding: '10px',
-          whiteSpace: 'nowrap'
-        }}>
-        {isLoading ? <p>Searching...</p> : (
-          freeResults.length === 0 ? <p>No results found.</p> :
-            freeResults.map((book, index) => (
-              book.title && (
-                <div 
-                  key={index} 
-                  className="book-card" 
-                  
-                  onClick={() => navigate(`/shared-book/${book.id}`)}
-                    style={{ cursor: "pointer", minWidth: '250px', minHeight: '300px', border: '1px solid #ccc', borderRadius: '8px', padding: '10px', textAlign: 'center' }}
-                >
-                  {/* Like Button */}
-                  <button 
-                    className="like-button" 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleLike(book);
-                    }}
-                  >
-                    ❤️
-                  </button>
-
-                  {/* Book Cover */}
-                  <div className="book-image">
-                    {book.formats?.['image/jpeg'] && (
-                      <img src={book.formats['image/jpeg']} alt="Book Cover" />
-                    )}
-                  </div>
-
-                  {/* Book Details - Visible on Hover */}
-                  <div className="book-details">
-                    <h3 className="book-title">{capitalizeTitle(cleanTitle(book.title))}</h3>
-                    <p className="book-author"><strong>Author:</strong> {book.authors?.map(a => a.name).join(', ') || 'Unknown'}</p>
-                    
-                 
-                    {/* Download Links */}
-                    <p className="download-options">
-                      {book.formats?.["application/epub+zip"] && (
-                        <a 
-                          href={book.formats["application/epub+zip"]} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          EPUB
-                        </a>
-                      )}
-                      {book.formats?.["application/x-mobipocket-ebook"] && book.formats?.["application/epub+zip"] && " | "}
-                      {book.formats?.["application/x-mobipocket-ebook"] && (
-                        <a 
-                          href={book.formats["application/x-mobipocket-ebook"]} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          Kindle
-                        </a>
-                      )}
-                      {book.formats?.["text/html"] && (
-                        <>
-                          {" | "}
-                          <a 
-                            href={book.formats["text/html"]} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            HTML
-                          </a>
-                        </>
-                      )}
-                    </p>
-                  </div>
-                </div>
-              )
-            ))
-        )}
+    <>
+      <Nav />
+      <div className="flex flex-col items-center w-full px-4">
+        <img src={logo} alt="GutenBae logo" className="w-24 h-auto mt-6 mb-4" />
+        <div className="w-full max-w-xl flex items-center gap-2">
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            placeholder="Search by Author, Title or ISBN"
+            className="w-full px-4 py-3 border border-gray-300 rounded-full text-center text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500"
+          />
         </div>
-      </div>
+        <p className="text-[#cd2126] italic text-sm mt-2 mb-6">Discover Over 75,000 Books In the Public Domain!</p>
 
-      {/* Google Books Results (cards) */}
-      <div style={{ width: '100%', marginTop: '20px' }}>
-        <h2>Google Books Results</h2>
-        <div style={{
-          display: 'flex',
-          overflowX: 'auto',
-          gap: '15px',
-          padding: '10px',
-          whiteSpace: 'nowrap'
-        }}>
-          {isLoading ? <p>Searching...</p> : (
-            googleResults.length === 0 ? <p>No results found.</p> :
-              googleResults.map((book, index) => (
-                <div 
-                  key={index} 
-                  className="book-card" 
-                  style={{
-                    minWidth: '250px',
-                    minHeight: '300px',
-                    border: '1px solid #ccc',
-                    borderRadius: '8px',
-                    padding: '10px',
-                    textAlign: 'center'
-                  }}
-                  //  Google Books info link to new tab:
-                  onClick={() => window.open(book.volumeInfo?.infoLink, "_blank")}
-                  
+        <section className="w-full max-w-screen-xl mb-10">
+          <h2 className="text-[#cd2126] font-bold text-lg mb-4">Free From Project Gutenberg</h2>
+          <div className="flex overflow-x-auto gap-4 pb-2">
+            {isLoading ? <p>Searching...</p> : freeResults.length === 0 ? (
+              <p>No results found.</p>
+            ) : (
+              freeResults.map((book, index) => (
+                <div
+                  key={index}
+                  onClick={() => navigate(`/shared-book/${book.id}`)}
+                  className="min-w-[231px] h-[231px] p-4 border border-gray-200 rounded-xl shadow-sm bg-white flex flex-col justify-between hover:shadow-md cursor-pointer"
                 >
-                  <h3 className="book-title">{book.volumeInfo?.title || 'No title available'}</h3>
-                  <p className="book-author">
-                    <strong>Author:</strong> {book.volumeInfo?.authors?.join(', ') || 'Unknown'}
-                  </p>
-                  {book.volumeInfo?.imageLinks?.thumbnail && (
-                    <img src={book.volumeInfo.imageLinks.thumbnail} alt="Book thumbnail" style={{ maxWidth: '100px' }} />
-                  )}
-                  <p>
-                    <a href={book.volumeInfo?.infoLink} target="_blank" rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}>
-                      Read More
-                    </a>
-                  </p>
+                  <div>
+                  <h3 className="font-[fira_sans] font-bold text-sm leading-tight mb-1 text-gray-700">
+  {truncateTitle(capitalizeTitle(cleanTitle(book.title)))}
+</h3>
+
+  <p className="text-[10px] text-gray-600 mb-2">
+    <strong>Author:</strong>{" "}
+    {book.authors?.map(a => a.name.replace(/-/g, ':')).join(', ') || 'Unknown'}
+  </p>
+                   
+  <p className="text-[10px] text-gray-500 truncate-summary">
+    {book.summaries[0]}
+  </p>
+
+
+                  </div>
+                  <div className="text-[#cd2126] text-[13px] font-['Fira_Sans']">
+                    {book.formats?.['application/epub+zip'] && <a href={book.formats['application/epub+zip']} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>EPUB</a>}
+                    {book.formats?.['application/x-mobipocket-ebook'] && ' | '}
+                    {book.formats?.['application/x-mobipocket-ebook'] && <a href={book.formats['application/x-mobipocket-ebook']} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>Kindle</a>}
+                    {book.formats?.['text/html'] && ' | '}
+                    {book.formats?.['text/html'] && <a href={book.formats['text/html']} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>HTML</a>}
+                  </div>
                 </div>
               ))
-          )}
-        </div>
+            )}
+          </div>
+        </section>
+
+        <section className="w-full max-w-screen-xl mb-10">
+          <h2 className="text-[#cd2126] font-bold text-lg mb-4">Google Results</h2>
+          <div className="flex overflow-x-auto gap-4 pb-2">
+            {googleResults.length === 0 ? (
+              <p>No results found.</p>
+            ) : (
+              googleResults.map((book, index) => (
+                <div
+                  key={index}
+                  onClick={() => window.open(book.volumeInfo?.infoLink, '_blank')}
+                  className="min-w-[231px] h-[231px] p-4 border border-gray-200 rounded-xl shadow-sm bg-white flex flex-col justify-between hover:shadow-md cursor-pointer"
+                >
+                  <h3 className="font-[fira_sans] font-bold text-sm leading-tight mb-1 text-gray-700">
+                    {truncateTitle(capitalizeTitle(cleanTitle(book.volumeInfo?.title || 'No title')))}
+                  </h3>
+                  <p className="text-[10px] text-gray-600 mb-1">
+                    <strong>Author:</strong> {book.volumeInfo?.authors?.join(', ') || 'Unknown'}
+                  </p>
+                  <p className="text-[10px] text-gray-500 italic mb-2">
+                    {book.volumeInfo?.description?.slice(0, 100) || 'No summary available.'}
+                  </p>
+                  <div className="text-blue-600 text-[13px]">
+                    <a href={book.volumeInfo?.infoLink} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>Read More</a>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -19,13 +19,20 @@
 .book-title {
   font-size: 15px;
   display: -webkit-box;
-  -webkit-line-clamp: 2; /* Limit to three lines */
+  -webkit-line-clamp: 2; /* Limit to 2 lines */
   -webkit-box-orient: vertical;
   overflow: hidden;
   white-space: normal;
   word-wrap: break-word; 
   text-overflow: clip; 
   text-align: left;
+}
+.truncate-summary {
+  display: -webkit-box;
+  -webkit-line-clamp: 7;     /* Limit to 7lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 
