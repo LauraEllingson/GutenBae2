@@ -107,26 +107,31 @@ const Home = () => {
   />
 
   {/* Search Bar */}
-  <div className="w-full max-w-md sm:max-w-xl md:max-w-xl flex items-center gap-2">
+  <div className="w-1/2 lg:w-1/4 mx-auto flex items-center gap-2">
     <input
       type="text"
       value={query}
       onChange={(e) => setQuery(e.target.value)}
       onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
       placeholder="Search by Author, Title or ISBN"
-      className="w-full px-4 py-2 sm:py-3 border border-gray-300 rounded-full text-center text-xs sm:text-base md:text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500"
+      className="w-full px-4 py-2 sm:py-3 border border-gray-300 rounded-full text-[0.625rem] sm:text-[0.75rem] md:text-sm text-center text-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500"
     />
   </div>
 
   {/* Tagline */}
-  <p className="text-[#cd2126] italic text-xs sm:text-xs md:text-base mt-2 mb-6 text-center">
+  <p className="text-[#cd2126] italic text-[0.5rem] sm:text-[0.6rem] md:text-sm mt-2 mb-6 text-center">
     Discover Over 75,000 Books In the Public Domain!
   </p>
-  <section className="w-full max-w-screen-xl mb-10 px-4 sm:px-6 lg:px-8">
-  <h2 className="text-[#cd2126] font-semibold text-xs sm:text-xs md:text-base mt-2 mb-6 ">
-    Free from Project Gutenberg
-  </h2>
-  <div className="flex overflow-x-auto gap-4 pb-2">
+    {/* Gutendex results slider */}
+    <section className="w-full mb-10">
+  {/* Title aligned with slider edge */}
+  <div className="px-4 sm:px-6 lg:px-8">
+    <h2 className="text-[#cd2126] font-[500] text-[0.625rem] sm:text-[0.75rem] md:text-sm mt-2 mb-6 text-left">
+      Free from Project Gutenberg
+    </h2>
+  </div>
+
+  <div className="flex overflow-x-auto gap-4 pb-2 px-4 sm:px-6 lg:px-8">
     {isLoading ? <p>Searching...</p> : freeResults.length === 0 ? (
       <p>No results found.</p>
     ) : (
@@ -137,13 +142,12 @@ const Home = () => {
           className="min-w-[200px] sm:min-w-[220px] md:min-w-[240px] lg:min-w-[260px] p-4 border border-gray-200 rounded-xl shadow-sm bg-white flex flex-col justify-between hover:shadow-md cursor-pointer"
         >
           <div>
-            <h3 className="font-[fira_sans] font-bold text-sm sm:text-sm md:text-base leading-tight mb-1 text-gray-700">
+          <h3 className="font-caslon font-[600] text-[0.625rem] sm:text-[0.75rem] md:text-sm leading-tight mb-1 text-gray-700">
               {truncateTitle(capitalizeTitle(cleanTitle(book.title)))}
             </h3>
-            <p className="text-[10px] sm:text-xs text-gray-600 mb-2">
-              <strong>Author:</strong>{" "}
-              {book.authors?.map(a => a.name.replace(/-/g, ':')).join(', ') || 'Unknown'}
-            </p>
+            <p className="book-author text-xs font-light font-caslon leading-tight mb-2 text-gray-700">
+ {book.authors?.map(a => a.name).join(', ') || 'Unknown'}
+</p>
             <p className="text-[10px] sm:text-xs text-gray-500 truncate-summary">
               {book.summaries?.[0]}
             </p>
@@ -172,36 +176,48 @@ const Home = () => {
     )}
   </div>
 </section>
+{/* Google results slider */}
+<section className="w-full mb-10">
+  <div className="px-4 sm:px-6 lg:px-8">
+    <h2 className="text-[#cd2126] font-[500] text-[0.625rem] sm:text-[0.75rem] md:text-sm mt-2 mb-6 text-left">
+      Google Results
+    </h2>
+  </div>
+  <div className="flex overflow-x-auto gap-4 pb-2 px-4 sm:px-6 lg:px-8">
 
-<section className="w-full max-w-screen-xl mb-10 px-4 sm:px-6 lg:px-8">
-  <h2 className="text-[#cd2126] font-semibold text-xs sm:text-xs md:text-base mt-2 mb-6 ">
-    Google Results
-  </h2>
-  <div className="flex overflow-x-auto gap-4 pb-2">
     {googleResults.length === 0 ? (
       <p>No results found.</p>
     ) : (
       googleResults.map((book, index) => (
         <div
-          key={index}
-          onClick={() => window.open(book.volumeInfo?.infoLink, '_blank')}
-          className="min-w-[200px] sm:min-w-[220px] md:min-w-[240px] lg:min-w-[260px] p-4 border border-gray-200 rounded-xl shadow-sm bg-white flex flex-col justify-between hover:shadow-md cursor-pointer"
-        >
-          <h3 className="font-[fira_sans] font-bold text-xs sm:text-sm md:text-base leading-tight mb-1 text-gray-700">
+        key={index}
+        onClick={() => window.open(book.volumeInfo?.infoLink, '_blank')}
+        className="min-w-[200px] sm:min-w-[220px] md:min-w-[240px] lg:min-w-[260px] p-4 border border-gray-200 rounded-xl shadow-sm bg-white flex flex-col justify-between hover:shadow-md cursor-pointer"
+      >
+        <div>
+          <h3 className="font-caslon font-[600] text-[0.625rem] sm:text-[0.75rem] md:text-sm leading-tight mb-1 text-gray-700 text-left">
             {truncateTitle(capitalizeTitle(cleanTitle(book.volumeInfo?.title || 'No title')))}
           </h3>
-          <p className="text-[10px] sm:text-xs text-gray-600 mb-1">
-            <strong>Author:</strong> {book.volumeInfo?.authors?.join(', ') || 'Unknown'}
+          <p className="book-author text-xs font-light font-caslon leading-tight mb-2 text-gray-700 text-left">
+            {book.volumeInfo?.authors?.join(', ') || 'Unknown'}
           </p>
-          <p className="text-[10px] sm:text-xs text-gray-500 italic mb-2">
-            {book.volumeInfo?.description?.slice(0, 100) || 'No summary available.'}
+          <p className="text-[10px] sm:text-xs text-gray-500 truncate-summary text-left">
+            {book.volumeInfo?.description?.slice(0, 300) || 'No summary available.'}
           </p>
-          <div className="text-blue-600 text-[11px] sm:text-[13px]">
-            <a href={book.volumeInfo?.infoLink} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
-              Read More
-            </a>
-          </div>
         </div>
+      
+        <div className="text-[#cd2126] text-[11px] sm:text-[13px] font-['Fira_Sans'] mt-2">
+          <a
+            href={book.volumeInfo?.infoLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            Read More
+          </a>
+        </div>
+      </div>
+      
       ))
     )}
   </div>

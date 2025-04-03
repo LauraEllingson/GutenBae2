@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
-import "./index.css";
+import { formatMultilineTitle } from './utils/formatMultilineTitle';
+
 
 const PublicBookDetail = () => {
   const { id } = useParams();
@@ -12,22 +13,19 @@ const PublicBookDetail = () => {
     axios
       .get(`https://gutendex.com/books/${id}`)
       .then((res) => {
-        console.log("Fetched book from Gutendex:", res.data);
         if (res.data.detail) {
           setError(res.data.detail);
         } else {
           setBook(res.data);
         }
       })
-      .catch((err) => {
-        console.error("Error fetching book details:", err);
+      .catch(() => {
         setError("Failed to load book details.");
       });
   }, [id]);
 
   const handleShare = () => {
     if (!book) return;
-    // url with domain and  book ID
     const detailURL = `${window.location.origin}/shared-book/${book.id}`;
     const shareData = {
       title: book.title,
@@ -36,99 +34,95 @@ const PublicBookDetail = () => {
     };
 
     if (navigator.share) {
-      navigator.share(shareData)
-        .then(() => console.log("Shared successfully"))
-        .catch((error) => {
-          if (error.name === "AbortError") {
-            console.log("Share canceled by the user");
-          } else {
-            console.error("Error sharing:", error);
-          }
-        });
+      navigator.share(shareData).catch(() => {});
     } else {
-      navigator.clipboard.writeText(detailURL)
-        .then(() => console.log("Link copied to clipboard"))
-        .catch((error) => console.error("Error copying link:", error));
+      navigator.clipboard.writeText(detailURL);
+      alert("Link copied to clipboard!");
     }
   };
 
-  if (error) return <p>{error}</p>;
-  if (!book) return <p>Loading...</p>;
+  if (error) return <p className="text-center mt-10 text-red-500">{error}</p>;
+  if (!book) return <p className="text-center mt-10">Loading...</p>;
 
-  //  use summaries array as description
-  const description =
-    book.summaries && book.summaries.length > 0 
-      ? book.summaries.join("\n\n")
-      : "No description available";
+  const description = book.summaries?.length
+    ? book.summaries.join("\n\n")
+    : "No description available";
 
   return (
-    <div className="book-detail">
-      <h2>{book.title}</h2>
-      <p>By: {book.authors.map(a => a.name).join(", ")}</p>
-      <img src={book.formats?.["image/jpeg"]} alt={book.title} />
-      
-      <div className="description-section">
-        <h3>Description</h3>
-        <p>{description}</p>
+    <div className="max-w-screen-xl mx-auto px-4 sm:px-8 py-10">
+      <div className="flex flex-col lg:flex-row gap-10">
+        {/* LEFT COLUMN - Info */}
+        <div className="flex-1">
+        <h1 className="book-title">
+  {formatMultilineTitle(book.title, {
+    firstLineClass: 'text-4xl sm:text-4xl font-caslon', // add google libre caslon
+    otherLinesClass: 'text-lg text-gray-600 font-caslon'
+  })}
+</h1>
+
+
+          <p className="text-sm text-gray-500 mb-6">
+            {book.authors.map(a => a.name).join(", ")}
+          </p>
+
+          <div className="space-y-4 text-sm sm:text-base text-gray-700 leading-relaxed max-w-prose mb-6">
+            {description.split("\n\n").map((para, i) => (
+              <p key={i}>{para}</p>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 text-sm text-[#cd2126] font-medium mt-4">
+            {book.formats?.["application/epub+zip"] && (
+              <a
+                href={book.formats["application/epub+zip"]}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                EPUB
+              </a>
+            )}
+            {book.formats?.["application/x-mobipocket-ebook"] && (
+              <>
+                <span>|</span>
+                <a
+                  href={book.formats["application/x-mobipocket-ebook"]}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Kindle
+                </a>
+              </>
+            )}
+            {book.formats?.["text/html"] && (
+              <>
+                <span>|</span>
+                <a
+                  href={book.formats["text/html"]}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  HTML
+                </a>
+              </>
+            )}
+            <span>|</span>
+            <button onClick={handleShare} className="underline">Share</button>
+            <span>|</span>
+            <Link to="/" className="underline">Back to Search</Link>
+          </div>
+        </div>
+
+        {/* RIGHT COLUMN - Cover Image */}
+        <div className="flex-shrink-0 w-full max-w-sm mx-auto lg:mx-0">
+          <img
+            src={book.formats?.["image/jpeg"]}
+            alt={book.title}
+            className="w-full h-auto rounded shadow"
+          />
+        </div>
       </div>
-      
-      <p className="download-options">
-  {book.formats?.["application/epub+zip"] && (
-    <a 
-      href={book.formats["application/epub+zip"]} 
-      target="_blank" 
-      rel="noopener noreferrer"
-      onClick={(e) => e.stopPropagation()}
-    >
-      EPUB
-    </a>
-  )}
-  {book.formats?.["application/x-mobipocket-ebook"] && book.formats?.["application/epub+zip"] && " | "}
-  {book.formats?.["application/x-mobipocket-ebook"] && (
-    <a 
-      href={book.formats["application/x-mobipocket-ebook"]} 
-      target="_blank" 
-      rel="noopener noreferrer"
-      onClick={(e) => e.stopPropagation()}
-    >
-      Kindle
-    </a>
-  )}
-  {book.formats?.["text/html"] && (book.formats?.["application/epub+zip"] || book.formats?.["application/x-mobipocket-ebook"]) && " | "}
-  {book.formats?.["text/html"] && (
-    <a 
-      href={book.formats["text/html"]} 
-      target="_blank" 
-      rel="noopener noreferrer"
-      onClick={(e) => e.stopPropagation()}
-    >
-      HTML
-    </a>
-    
-  )}
-  
-  {(book.formats?.["application/epub+zip"] || book.formats?.["application/x-mobipocket-ebook"] || book.formats?.["text/html"]) && " | "}
-  <a 
-    href="#" 
-    className="share-link" 
-    onClick={(e) => {
-      e.stopPropagation();
-      handleShare(book.bookId);
-    }}
-  >
-    Share
-  </a>
-  {" | "}
-  
-  <Link to="/" className="home-link">
-     Home
-  </Link>
-
-</p>
-</div>
-
+    </div>
   );
-
-  }
+};
 
 export default PublicBookDetail;

@@ -1,5 +1,21 @@
 @import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&display=swap');
+
+
+
+
+
+.font-caslon-display {
+  font-family: 'Libre Caslon Display', serif;
+}
+
+.font-caslon-text {
+  font-family: 'Libre Caslon Text', serif;
+}
 
 .custom-title {
   font-family: 'Bebas Neue', sans-serif;
@@ -9,12 +25,14 @@
 }
 .book-author,
 .book-topic {
-  word-wrap: break-word; /* long words break */
+  word-wrap: break-word;
   overflow-wrap: break-word;
-  white-space: normal; 
-  max-width: 100%; 
+  white-space: normal;
+  max-width: 100%;
   text-align: left;
+  font-style: italic;
 }
+
 
 .book-title {
   font-size: 15px;
