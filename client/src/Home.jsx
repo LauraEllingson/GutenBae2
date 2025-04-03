@@ -122,7 +122,7 @@ const Home = () => {
     Discover Over 75,000 Books In the Public Domain!
   </p>
   <section className="w-full max-w-screen-xl mb-10 px-4 sm:px-6 lg:px-8">
-  <h2 className="text-xs font-semibold text-gray-800 mb-3">
+  <h2 className="text-[#cd2126] font-semibold text-xs sm:text-xs md:text-base mt-2 mb-6 ">
     Free from Project Gutenberg
   </h2>
   <div className="flex overflow-x-auto gap-4 pb-2">
@@ -136,7 +136,7 @@ const Home = () => {
           className="min-w-[200px] sm:min-w-[220px] md:min-w-[240px] lg:min-w-[260px] p-4 border border-gray-200 rounded-xl shadow-sm bg-white flex flex-col justify-between hover:shadow-md cursor-pointer"
         >
           <div>
-            <h3 className="font-[fira_sans] font-bold text-xs sm:text-sm md:text-base leading-tight mb-1 text-gray-700">
+            <h3 className="font-[fira_sans] font-bold text-sm sm:text-sm md:text-base leading-tight mb-1 text-gray-700">
               {truncateTitle(capitalizeTitle(cleanTitle(book.title)))}
             </h3>
             <p className="text-[10px] sm:text-xs text-gray-600 mb-2">
@@ -173,7 +173,7 @@ const Home = () => {
 </section>
 
 <section className="w-full max-w-screen-xl mb-10 px-4 sm:px-6 lg:px-8">
-  <h2 className="text-xs font-semibold text-gray-800 mb-3">
+  <h2 className="text-[#cd2126] font-semibold text-xs sm:text-xs md:text-base mt-2 mb-6 ">
     Google Results
   </h2>
   <div className="flex overflow-x-auto gap-4 pb-2">
