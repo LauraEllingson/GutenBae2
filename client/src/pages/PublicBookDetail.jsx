@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
-import { formatMultilineTitle } from './utils/formatMultilineTitle';
-import Nav from './Nav';
+import { formatMultilineTitle } from '../utils/formatMultilineTitle';
+import Nav from '../components/Nav';
 
 const PublicBookDetail = () => {
   const { id } = useParams();

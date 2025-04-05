@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import submark from './assets/r_submark.png';
+import submark from '../assets/r_submark.png';
 
 const Nav = ({ loggedIn }) => {
   const navigate = useNavigate();

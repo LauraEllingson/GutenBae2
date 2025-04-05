@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import submark from './assets/r_submark.png'; 
+import submark from '../assets/r_submark.png'; 
 
 const Registration = () => {
   const [name, setName] = useState('');
