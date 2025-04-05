@@ -5,13 +5,11 @@ import Landing from '../components/Landing';
 import Nav from '../components/Nav';
 import axios from 'axios';
 
-
 import logo from '../assets/logo.png';
 import epubIcon from '../assets/epub.png';
 import htmlIcon from '../assets/html.png';
 import likeIcon from '../assets/like.png';
 import likedIcon from '../assets/liked.png';
-
 
 const truncateTitle = (title) => {
   const match = title.match(/(.+?[:;!?—–-])/);
@@ -73,7 +71,9 @@ const Home = () => {
       setGoogleResults([]);
       return;
     }
+
     setIsLoading(true);
+
     const gutendexApiUrl = `https://gutendex.com/books/?search=${encodeURIComponent(query)}&page_size=10`;
     const googleApiUrl = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}`;
 
@@ -82,6 +82,7 @@ const Home = () => {
         fetch(gutendexApiUrl),
         fetch(googleApiUrl),
       ]);
+
       if (!gutendexResponse.ok || !googleResponse.ok) throw new Error('API error');
 
       const gutendexData = await gutendexResponse.json();
@@ -149,13 +150,6 @@ const Home = () => {
             handleSearch();
           }}
         />
-
-        {!freeResults.length && !googleResults.length && (
-          <>
-           
-            <Landing />
-          </>
-        )}
 
         {freeResults.length > 0 && (
           <section className="w-full mb-10">
@@ -258,6 +252,9 @@ const Home = () => {
             </div>
           </section>
         )}
+
+        {/* Landing section is always visible below */}
+        <Landing />
       </div>
     </>
   );
