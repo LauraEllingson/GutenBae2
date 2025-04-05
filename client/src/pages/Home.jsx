@@ -4,12 +4,10 @@ import SearchBar from '../components/SearchBar';
 import Landing from '../components/Landing';
 import Nav from '../components/Nav';
 import axios from 'axios';
+import GutenbergSliderCard from '../components/GutenbergSliderCard';
+import GoogleSliderCard from '../components/GoogleSliderCard';
 
 import logo from '../assets/logo.png';
-import epubIcon from '../assets/epub.png';
-import htmlIcon from '../assets/html.png';
-import likeIcon from '../assets/like.png';
-import likedIcon from '../assets/liked.png';
 
 const truncateTitle = (title) => {
   const match = title.match(/(.+?[:;!?—–-])/);
@@ -128,10 +126,10 @@ const Home = () => {
       });
 
       setLikedBookIds((prev) => new Set(prev).add(id));
-      setLikeMessage('✅ Book liked and saved to your library!');
+      setLikeMessage('Book liked and saved to your library!');
       setTimeout(() => setLikeMessage(''), 3000);
     } catch (error) {
-      alert('Error liking book');
+      alert('Error! Book cannot be liked twice, it is already in your library.');
     }
   };
 
@@ -163,49 +161,13 @@ const Home = () => {
                 <p>Searching...</p>
               ) : (
                 freeResults.map((book, index) => (
-                  <div
+                  <GutenbergSliderCard
                     key={index}
+                    book={book}
+                    isLiked={likedBookIds.has(book.id || book.bookId)}
+                    onLike={toggleLike}
                     onClick={() => navigate(`/shared-book/${book.id}`)}
-                    className="min-w-[220px] md:min-w-[240px] lg:min-w-[260px] p-4 border border-gray-200 rounded-xl shadow-sm bg-white flex flex-col justify-between hover:shadow-md cursor-pointer"
-                  >
-                    <div>
-                      <h3 className="font-caslon font-[600] text-sm leading-tight mb-1 text-gray-700">
-                        {truncateTitle(capitalizeTitle(cleanTitle(book.title)))}
-                      </h3>
-                      <p className="text-xs font-light font-caslon leading-tight mb-2 text-gray-700">
-                        {book.authors?.map((a) => a.name).join(', ') || 'Unknown'}
-                      </p>
-                      <p className="text-xs text-gray-500 truncate-summary">
-                        {book.summaries?.[0]}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between mt-2">
-                      <div className="flex gap-2 items-center">
-                        {book.formats?.['application/epub+zip'] && (
-                          <a href={book.formats['application/epub+zip']} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
-                            <img src={epubIcon} alt="EPUB" className="w-5 h-5" />
-                          </a>
-                        )}
-                        {book.formats?.['text/html'] && (
-                          <a href={book.formats['text/html']} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
-                            <img src={htmlIcon} alt="HTML" className="w-5 h-5" />
-                          </a>
-                        )}
-                      </div>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleLike(book);
-                        }}
-                      >
-                        <img
-                          src={likedBookIds.has(book.id || book.bookId) ? likedIcon : likeIcon}
-                          alt="Like"
-                          className="w-5 h-5"
-                        />
-                      </button>
-                    </div>
-                  </div>
+                  />
                 ))
               )}
             </div>
@@ -221,39 +183,16 @@ const Home = () => {
             </div>
             <div className="flex overflow-x-auto gap-4 pb-2 px-4 sm:px-6 lg:px-8">
               {googleResults.map((book, index) => (
-                <div
+                <GoogleSliderCard
                   key={index}
+                  book={book}
                   onClick={() => window.open(book.volumeInfo?.infoLink, '_blank')}
-                  className="min-w-[220px] md:min-w-[240px] lg:min-w-[260px] p-4 border border-gray-200 rounded-xl shadow-sm bg-white flex flex-col justify-between hover:shadow-md cursor-pointer"
-                >
-                  <div>
-                    <h3 className="font-caslon font-[600] text-sm leading-tight mb-1 text-gray-700 text-left">
-                      {truncateTitle(capitalizeTitle(cleanTitle(book.volumeInfo?.title || 'No title')))}
-                    </h3>
-                    <p className="text-xs font-light font-caslon leading-tight mb-2 text-gray-700 text-left">
-                      {book.volumeInfo?.authors?.join(', ') || 'Unknown'}
-                    </p>
-                    <p className="text-xs text-gray-500 truncate-summary text-left">
-                      {book.volumeInfo?.description?.slice(0, 300) || 'No summary available.'}
-                    </p>
-                  </div>
-                  <div className="text-[#cd2126] text-xs mt-2">
-                    <a
-                      href={book.volumeInfo?.infoLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      Read More
-                    </a>
-                  </div>
-                </div>
+                />
               ))}
             </div>
           </section>
         )}
 
-        {/* Landing section is always visible below */}
         <Landing />
       </div>
     </>
