@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaBookOpen } from 'react-icons/fa';
+import { IconRead } from '../utils/icons';
 
 const GoogleSliderCard = ({ book, onClick }) => {
   const title = book.volumeInfo?.title || 'No title';
@@ -24,7 +24,8 @@ const GoogleSliderCard = ({ book, onClick }) => {
         </p>
       </div>
 
-      <div className="flex items-center justify-end mt-2 text-red-600 text-lg">
+      {/* Icon Row */}
+      <div className="flex items-center justify-left mt-2 text-red-600 text-sm">
         {infoLink && (
           <a
             href={infoLink}
@@ -32,8 +33,10 @@ const GoogleSliderCard = ({ book, onClick }) => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
+            className="flex items-center gap-1 hover:underline"
           >
-            <FaBookOpen />
+            <IconRead className="text-lg" />
+            <span className="text-[10px]">More From Google</span>
           </a>
         )}
       </div>

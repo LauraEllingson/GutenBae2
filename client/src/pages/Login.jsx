@@ -6,6 +6,7 @@ import logo from "../assets/r_submark.png";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
@@ -23,21 +24,30 @@ const Login = () => {
         alert("Login Successful!");
         navigate("/dashboard");
       })
-      .catch((error) => {
+      .catch(() => {
         alert("Error logging in");
       });
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-[#002f9b] to-white">
-      <div className="flex flex-col items-center p-6 w-full max-w-sm bg-transparent">
-        <img src={logo} alt="GutenBae logo" className="w-20 h-20 mb-4" />
-        <h1 className="text-[#cd2126] text-4xl font-bold mb-8" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>GUTENBAE</h1>
+    <div className="min-h-screen bg-gradient-to-b from-[#ccd8f6] via-[#0f3596] to-[#0f3596] px-4 pt-6 pb-12">
+      <div className="flex flex-col items-center w-full max-w-sm mx-auto">
+        <img src={logo} alt="GutenBae logo" className="w-28 h-28 mb-3" />
+        <h1
+          className="text-[#cd2126] text-4xl font-bold mb-6"
+          style={{ fontFamily: "Bebas Neue, sans-serif" }}
+        >
+          GUTENBAE
+        </h1>
 
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col gap-4 w-full text-center"
+          className="bg-white p-6 rounded-2xl shadow-md w-full flex flex-col gap-4 text-center"
         >
+          <h2 className="text-lg font-semibold text-gray-700 mb-2">
+            Login to your account
+          </h2>
+
           <input
             type="email"
             placeholder="Email"
@@ -45,23 +55,34 @@ const Login = () => {
             onChange={(e) => setEmail(e.target.value)}
             className="rounded-lg px-4 py-3 text-sm border border-gray-300 focus:outline-none"
           />
+
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="rounded-lg px-4 py-3 text-sm border border-gray-300 focus:outline-none"
           />
+
+          <label className="flex items-center gap-2 text-xs text-gray-600 -mt-2">
+            <input
+              type="checkbox"
+              checked={showPassword}
+              onChange={() => setShowPassword(!showPassword)}
+            />
+            Show password
+          </label>
+
           <button
             type="submit"
-            className="bg-white text-black font-semibold py-3 rounded-lg shadow hover:opacity-90"
+            className="bg-[#cd2126] text-white font-semibold py-3 rounded-lg shadow hover:bg-[#b41c20] transition"
           >
             Login
           </button>
           <button
             type="button"
             onClick={() => navigate("/register")}
-            className="bg-white text-black font-semibold py-3 rounded-lg shadow hover:opacity-90"
+            className="bg-white border border-gray-300 text-black font-semibold py-3 rounded-lg shadow hover:opacity-90"
           >
             Sign up
           </button>

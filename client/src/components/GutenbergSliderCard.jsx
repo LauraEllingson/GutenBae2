@@ -1,9 +1,13 @@
 import React from 'react';
 import {
-  HiDocumentArrowDown,
-} from 'react-icons/hi2';
-import { HiPaperAirplane } from 'react-icons/hi';
-import { FaHeart, FaRegHeart, FaFire, FaBookOpen } from 'react-icons/fa';
+  IconBookOpen,
+  IconEPUB,
+  IconKindle,
+  IconShare,
+  IconHeart,
+  IconHeartOutline,
+  IconRead,
+} from '../utils/icons';
 
 const GutenbergSliderCard = ({ book, isLiked, onLike, onClick }) => {
   const title = book.title;
@@ -56,7 +60,7 @@ const GutenbergSliderCard = ({ book, isLiked, onLike, onClick }) => {
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
             >
-              <FaBookOpen />
+              <IconRead />
             </a>
           )}
 
@@ -68,7 +72,7 @@ const GutenbergSliderCard = ({ book, isLiked, onLike, onClick }) => {
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
             >
-              <HiDocumentArrowDown />
+              <IconEPUB />
             </a>
           )}
 
@@ -80,7 +84,7 @@ const GutenbergSliderCard = ({ book, isLiked, onLike, onClick }) => {
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
             >
-              <FaFire />
+              <IconKindle />
             </a>
           )}
 
@@ -89,7 +93,7 @@ const GutenbergSliderCard = ({ book, isLiked, onLike, onClick }) => {
             title="Share"
             className="hover:opacity-80"
           >
-            <HiPaperAirplane />
+            <IconShare />
           </button>
         </div>
 
@@ -101,11 +105,7 @@ const GutenbergSliderCard = ({ book, isLiked, onLike, onClick }) => {
           }}
           title={isLiked ? 'Liked' : 'Like this book'}
         >
-          {isLiked ? (
-            <FaHeart className="text-red-600" />
-          ) : (
-            <FaRegHeart className="text-red-600" />
-          )}
+          {isLiked ? <IconHeart /> : <IconHeartOutline />}
         </button>
       </div>
     </div>

@@ -1,36 +1,64 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
 import submark from '../assets/r_submark.png';
 
-const Nav = ({ loggedIn }) => {
+const Nav = () => {
   const navigate = useNavigate();
+  const location = useLocation(); 
+  const { loggedIn, logout } = useAuth();
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    logout();
     navigate('/login');
     window.location.reload();
   };
 
+
+  const isActive = (path) => location.pathname === path;
+
   return (
-    <nav className="flex flex-col sm:flex-row items-center justify-between px-4 sm:px-6 py-4 shadow-md bg-white w-full">
-      {/* Logo */}
+    <nav className="sticky top-0 z-50 flex flex-col sm:flex-row items-center justify-between px-4 sm:px-6 py-4 shadow-md bg-white w-full">
+
       <div className="flex items-center gap-2 mb-2 sm:mb-0">
         <img src={submark} alt="GutenBae Logo" className="w-8 h-8 sm:w-10 sm:h-10" />
       </div>
-
-      {/* Navigation links */}
-      <div className="space-x-4 sm:space-x-6 text-xs sm:text-base font-semibold text-gray-800">
+      <div className="space-x-4 sm:space-x-6 text-xs sm:text-base font-semibold">
         {loggedIn ? (
           <>
-            <Link to="/dashboard" className="hover:text-[#cd2126]">Dashboard</Link>
-            <Link to="/" className="hover:text-[#cd2126]">Search</Link>
-            <button onClick={handleLogout} className="hover:text-[#cd2126]">Logout</button>
+            <Link
+              to="/dashboard"
+              className={`hover:text-[#cd2126] ${isActive('/dashboard') ? 'text-[#cd2126]' : 'text-gray-800'}`}
+            >
+              Dashboard
+            </Link>
+            <Link
+              to="/"
+              className={`hover:text-[#cd2126] ${isActive('/') ? 'text-[#cd2126]' : 'text-gray-800'}`}
+            >
+              Search
+            </Link>
+            <button onClick={handleLogout} className="hover:text-[#cd2126] text-gray-800">
+              Logout
+            </button>
           </>
         ) : (
           <>
-            <Link to="/dashboard" className="hover:text-[#cd2126]">About</Link>
-            <Link to="/search" className="hover:text-[#cd2126]">How It Works</Link>
-            <Link to="/login" className="hover:text-[#cd2126]">Login</Link>
+            <Link
+              to="/dashboard"
+              className={`hover:text-[#cd2126] ${isActive('/dashboard') ? 'text-[#cd2126]' : 'text-gray-800'}`}
+            >
+              About
+            </Link>
+            <Link
+              to="/search"
+              className={`hover:text-[#cd2126] ${isActive('/search') ? 'text-[#cd2126]' : 'text-gray-800'}`}
+            >
+              How It Works
+            </Link>
+            <Link to="/login" className="hover:text-[#cd2126] text-gray-800">
+              Login
+            </Link>
           </>
         )}
       </div>

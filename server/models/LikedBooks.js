@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const LikedBookSchema = new mongoose.Schema(
   {
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // ✅ Add this
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, 
     bookId: { type: String, required: true },
     title: { type: String, required: true },
     authors: { type: [String], required: true },
