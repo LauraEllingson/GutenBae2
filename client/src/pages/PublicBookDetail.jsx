@@ -52,7 +52,7 @@ const PublicBookDetail = () => {
 
   const toggleLike = () => {
     setLiked(prev => !prev);
-    alert(liked ? "Removed from liked books" : "Book liked and saved to your library!");
+    alert(liked ? "Removed from liked books" : "Book already in your library!");
   };
 
   if (error) return <p className="text-center mt-10 text-red-500">{error}</p>;
