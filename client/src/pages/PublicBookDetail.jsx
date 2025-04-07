@@ -17,6 +17,19 @@ const PublicBookDetail = () => {
   const [book, setBook] = useState(null);
   const [error, setError] = useState(null);
   const [liked, setLiked] = useState(false);
+  const [likedBookIds, setLikedBookIds] = useState(new Set());
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      axios
+        .get("https://gutenbae2.onrender.com/user/liked-book-ids", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => setLikedBookIds(new Set(res.data.likedBookIds)))
+        .catch(() => console.error("Failed to fetch liked book IDs"));
+    }
+  }, []);
 
   useEffect(() => {
     axios
@@ -26,33 +39,59 @@ const PublicBookDetail = () => {
           setError(res.data.detail);
         } else {
           setBook(res.data);
+          setLiked(likedBookIds.has(res.data.id));
         }
       })
       .catch(() => {
         setError("Failed to load book details.");
       });
-  }, [id]);
+  }, [id, likedBookIds]);
 
   const handleShare = () => {
     if (!book) return;
     const detailURL = `${window.location.origin}/shared-book/${book.id}`;
-    const shareData = {
-      title: book.title,
-      text: `Check out this book: ${book.title} by ${book.authors.map(a => a.name).join(", ")}`,
-      url: detailURL,
-    };
-
     if (navigator.share) {
-      navigator.share(shareData).catch(() => {});
+      navigator.share({
+        title: book.title,
+        text: `Check out this book: ${book.title} by ${book.authors.map(a => a.name).join(", ")}`,
+        url: detailURL,
+      }).catch(() => {});
     } else {
       navigator.clipboard.writeText(detailURL);
       alert("Link copied to clipboard!");
     }
   };
 
-  const toggleLike = () => {
-    setLiked(prev => !prev);
-    alert(liked ? "Removed from liked books" : "Book already in your library!");
+  const toggleLike = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return alert("Please log in to like this book");
+    if (!book) return;
+
+    if (likedBookIds.has(book.id)) {
+      alert("Error! Book is already in your library.");
+      return;
+    }
+
+    const likedBookData = {
+      bookId: book.id,
+      title: book.title,
+      authors: book.authors ? book.authors.map((a) => a.name) : ['Unknown'],
+      imageUrl: book.formats?.['image/jpeg'] || '',
+      description: book.summaries?.join('\n\n') || 'No description available',
+      formats: book.formats || {},
+    };
+
+    try {
+      await axios.post("https://gutenbae2.onrender.com/like-book", likedBookData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setLiked(true);
+      setLikedBookIds((prev) => new Set(prev).add(book.id));
+      alert("Book liked and saved to your library!");
+    } catch (error) {
+      alert("Error! Could not like the book.");
+    }
   };
 
   if (error) return <p className="text-center mt-10 text-red-500">{error}</p>;
@@ -107,32 +146,17 @@ const PublicBookDetail = () => {
 
           <div className="flex flex-wrap items-center gap-4 text-sm text-[#cd2126] mb-6">
             {book.formats?.["text/html"] && (
-              <a
-                href={book.formats["text/html"]}
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Read in Browser"
-              >
+              <a href={book.formats["text/html"]} target="_blank" rel="noopener noreferrer" title="Read in Browser">
                 <IconRead className="inline mr-1" /> Preview
               </a>
             )}
             {book.formats?.["application/epub+zip"] && (
-              <a
-                href={book.formats["application/epub+zip"]}
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Download EPUB"
-              >
+              <a href={book.formats["application/epub+zip"]} target="_blank" rel="noopener noreferrer" title="Download EPUB">
                 <IconEPUB className="inline mr-1" /> EPUB
               </a>
             )}
             {book.formats?.["application/x-mobipocket-ebook"] && (
-              <a
-                href={book.formats["application/x-mobipocket-ebook"]}
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Download Kindle"
-              >
+              <a href={book.formats["application/x-mobipocket-ebook"]} target="_blank" rel="noopener noreferrer" title="Download Kindle">
                 <IconKindle className="inline mr-1" /> Kindle
               </a>
             )}
