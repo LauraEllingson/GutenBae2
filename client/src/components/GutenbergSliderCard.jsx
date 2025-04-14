@@ -11,8 +11,13 @@ import {
 
 const GutenbergSliderCard = ({ book, isLiked, onLike, onClick }) => {
   const title = book.title;
-  const authors = book.authors?.map((a) => a.name).join(', ') || 'Unknown';
-  const summary = book.summaries?.[0];
+  const authorsList = book.authors?.map((a) => a.name) || [];
+const authors =
+  authorsList.length > 2
+    ? `${authorsList[0]}, ${authorsList[1]}, et al.`
+    : authorsList.join(', ') || 'Unknown';
+
+  const summary = book.summaries?.[0] || 'No summary available.';
 
   const epubLink = book.formats?.['application/epub+zip'];
   const htmlLink = book.formats?.['text/html'];
@@ -21,12 +26,14 @@ const GutenbergSliderCard = ({ book, isLiked, onLike, onClick }) => {
   const handleShare = (e) => {
     e.stopPropagation();
     if (navigator.share) {
-      navigator.share({
-        title: book.title,
-        url: window.location.href,
-      }).catch(() => {
-        alert('Sharing failed or not supported.');
-      });
+      navigator
+        .share({
+          title: book.title,
+          url: window.location.href,
+        })
+        .catch(() => {
+          alert('Sharing failed or not supported.');
+        });
     } else {
       alert('Sharing not supported in this browser.');
     }
@@ -35,16 +42,18 @@ const GutenbergSliderCard = ({ book, isLiked, onLike, onClick }) => {
   return (
     <div
       onClick={onClick}
-      className="min-w-[220px] md:min-w-[240px] lg:min-w-[260px] p-4 border border-gray-200 rounded-xl shadow-sm bg-white flex flex-col justify-between hover:shadow-md cursor-pointer"
+      className="h-[250px] min-w-[200px] max-w-[240px] p-4 border border-gray-200 rounded-xl shadow-sm bg-white flex flex-col justify-between hover:shadow-md cursor-pointer"
     >
       <div>
-        <h3 className="font-caslon font-[600] text-sm leading-tight mb-1 text-gray-700">
-          {title}
-        </h3>
+      <h3 className="font-caslon font-[600] text-sm leading-tight mb-1 text-gray-700 overflow-hidden text-ellipsis"
+    style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+  {title}
+</h3>
+
         <p className="text-xs font-light font-caslon leading-tight mb-2 text-gray-700">
           {authors}
         </p>
-        <p className="text-xs text-gray-500 truncate-summary">
+        <p className="text-xs text-gray-500 text-left overflow-hidden h-[100px] leading-snug">
           {summary}
         </p>
       </div>

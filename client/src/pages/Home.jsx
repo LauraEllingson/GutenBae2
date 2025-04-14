@@ -23,6 +23,8 @@ const Home = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [likedBookIds, setLikedBookIds] = useState(new Set());
   const [likeMessage, setLikeMessage] = useState('');
+  const [showAllFree, setShowAllFree] = useState(false);
+  const [showAllGoogle, setShowAllGoogle] = useState(false);
 
   const cleanTitle = (title) =>
     title.replace(/\$b/g, '').replace(/[-–—]/g, '');
@@ -136,9 +138,16 @@ const Home = () => {
   return (
     <>
       <Nav loggedIn={loggedIn} />
-      <div className="flex flex-col items-center w-full px-4 sm:px-8 lg:px-16 xl:px-24">
-        <img src={logo} alt="GutenBae logo" className="w-20 sm:w-24 md:w-28 lg:w-32 h-auto mt-6 mb-4" />
-        {likeMessage && <p className="text-green-600 text-sm mb-4">{likeMessage}</p>}
+      <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+        <img
+          src={logo}
+          alt="GutenBae logo"
+          className="w-20 sm:w-24 md:w-28 lg:w-32 h-auto mt-6 mb-4"
+        />
+
+        {likeMessage && (
+          <p className="text-green-600 text-sm mb-4">{likeMessage}</p>
+        )}
 
         <SearchBar
           query={query}
@@ -150,46 +159,64 @@ const Home = () => {
         />
 
         {freeResults.length > 0 && (
-          <section className="w-full mb-10">
-            <div className="px-4 sm:px-6 lg:px-8">
-              <h2 className="text-[#cd2126] font-[500] text-[0.625rem] sm:text-[0.75rem] md:text-sm mt-2 mb-6 text-left">
-                Free from Project Gutenberg
-              </h2>
-            </div>
-            <div className="flex overflow-x-auto gap-4 pb-2 px-4 sm:px-6 lg:px-8">
-              {isLoading ? (
-                <p>Searching...</p>
-              ) : (
-                freeResults.map((book, index) => (
+          <section className="w-full mb-10 bg-white rounded-xl p-4">
+            <h2 className="text-[#cd2126] font-[500] text-sm text-center sm:text-left px-4 sm:px-6 mt-2 mb-6">
+              Free from Project Gutenberg
+            </h2>
+            <div className="flex flex-wrap gap-6 justify-center md:justify-start px-4 sm:px-6">
+              {(showAllFree ? freeResults : freeResults.slice(0, 8)).map((book, index) => (
+                <div
+                  key={index}
+                  className="w-[20%] min-w-[200px] max-w-[240px] flex-grow"
+                >
                   <GutenbergSliderCard
-                    key={index}
                     book={book}
                     isLiked={likedBookIds.has(book.id || book.bookId)}
                     onLike={toggleLike}
                     onClick={() => navigate(`/shared-book/${book.id}`)}
                   />
-                ))
-              )}
+                </div>
+              ))}
             </div>
+            {freeResults.length > 8 && (
+              <button
+                onClick={() => setShowAllFree(!showAllFree)}
+                className="mt-4 text-sm px-4 sm:px-6 text-[#cd2126] hover:underline "
+              >
+                {showAllFree ? 'See Less' : 'See More'}
+              </button>
+            )}
           </section>
         )}
 
         {googleResults.length > 0 && (
-          <section className="w-full mb-10">
-            <div className="px-4 sm:px-6 lg:px-8">
-              <h2 className="text-[#cd2126] font-[500] text-[0.625rem] sm:text-[0.75rem] md:text-sm mt-2 mb-6 text-left">
-                Google Results
-              </h2>
-            </div>
-            <div className="flex overflow-x-auto gap-4 pb-2 px-4 sm:px-6 lg:px-8">
-              {googleResults.map((book, index) => (
-                <GoogleSliderCard
+          <section className="w-full mb-10 bg-white	 rounded-xl p-4">
+            <h2 className="text-[#cd2126] font-[500] text-sm text-center sm:text-left px-4 sm:px-6 mt-2 mb-6">
+              Google Results
+            </h2>
+            <div className="flex flex-wrap gap-6 justify-center md:justify-start px-4 sm:px-6">
+              {(showAllGoogle ? googleResults : googleResults.slice(0, 8)).map((book, index) => (
+                <div
                   key={index}
-                  book={book}
-                  onClick={() => window.open(book.volumeInfo?.infoLink, '_blank')}
-                />
+                  className="w-[20%] min-w-[200px] max-w-[240px] flex-grow"
+                >
+                  <GoogleSliderCard
+                    book={book}
+                    isLiked={likedBookIds.has(book.id)}
+                    onLike={toggleLike}
+                    onClick={() => window.open(book.volumeInfo?.infoLink, '_blank')}
+                  />
+                </div>
               ))}
             </div>
+            {googleResults.length > 8 && (
+              <button
+                onClick={() => setShowAllGoogle(!showAllGoogle)}
+                className="mt-4 px-4 sm:px-6 text-sm text-[#cd2126] hover:underline"
+              >
+                {showAllGoogle ? 'See Less' : 'See More'}
+              </button>
+            )}
           </section>
         )}
 
