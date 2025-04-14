@@ -21,7 +21,7 @@ const Registration = () => {
     axios.post('https://gutenbae2.onrender.com/register', { name, email, password })
       .then(() => {
         alert("Registration Successful!");
-        navigate('/login');
+        navigate('/dashboard');
       })
       .catch(() => {
         alert("Error registering user!");

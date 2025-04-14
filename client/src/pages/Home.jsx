@@ -163,25 +163,30 @@ const Home = () => {
             <h2 className="text-[#cd2126] font-[500] text-sm text-center sm:text-left px-4 sm:px-6 mt-2 mb-6">
               Free from Project Gutenberg
             </h2>
-            <div className="flex flex-wrap gap-6 justify-center md:justify-start px-4 sm:px-6">
-              {(showAllFree ? freeResults : freeResults.slice(0, 8)).map((book, index) => (
-                <div
-                  key={index}
-                  className="w-[20%] min-w-[200px] max-w-[240px] flex-grow"
-                >
-                  <GutenbergSliderCard
-                    book={book}
-                    isLiked={likedBookIds.has(book.id || book.bookId)}
-                    onLike={toggleLike}
-                    onClick={() => navigate(`/shared-book/${book.id}`)}
-                  />
-                </div>
-              ))}
+            <div className="relative">
+              <div className="sm:hidden text-gray-400 text-xs absolute left-2 -top-5">
+                ← Swipe to see more
+              </div>
+              <div className="flex sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 overflow-x-auto sm:overflow-visible px-2 sm:px-6 pb-2 sm:pb-0">
+                {(showAllFree ? freeResults : freeResults.slice(0, 8)).map((book, index) => (
+                  <div
+                    key={index}
+                    className="min-w-[200px] max-w-[240px] flex-shrink-0 sm:flex-shrink sm:w-full"
+                  >
+                    <GutenbergSliderCard
+                      book={book}
+                      isLiked={likedBookIds.has(book.id || book.bookId)}
+                      onLike={toggleLike}
+                      onClick={() => navigate(`/shared-book/${book.id}`)}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
             {freeResults.length > 8 && (
               <button
                 onClick={() => setShowAllFree(!showAllFree)}
-                className="mt-4 text-sm px-4 sm:px-6 text-[#cd2126] hover:underline "
+                className="hidden sm:inline mt-4 text-sm px-4 sm:px-6 text-[#cd2126] hover:underline"
               >
                 {showAllFree ? 'See Less' : 'See More'}
               </button>
@@ -190,29 +195,34 @@ const Home = () => {
         )}
 
         {googleResults.length > 0 && (
-          <section className="w-full mb-10 bg-white	 rounded-xl p-4">
+          <section className="w-full mb-10 bg-white rounded-xl p-4">
             <h2 className="text-[#cd2126] font-[500] text-sm text-center sm:text-left px-4 sm:px-6 mt-2 mb-6">
               Google Results
             </h2>
-            <div className="flex flex-wrap gap-6 justify-center md:justify-start px-4 sm:px-6">
-              {(showAllGoogle ? googleResults : googleResults.slice(0, 8)).map((book, index) => (
-                <div
-                  key={index}
-                  className="w-[20%] min-w-[200px] max-w-[240px] flex-grow"
-                >
-                  <GoogleSliderCard
-                    book={book}
-                    isLiked={likedBookIds.has(book.id)}
-                    onLike={toggleLike}
-                    onClick={() => window.open(book.volumeInfo?.infoLink, '_blank')}
-                  />
-                </div>
-              ))}
+            <div className="relative">
+              <div className="sm:hidden text-gray-400 text-xs absolute left-2 -top-5">
+                ← Swipe to see more
+              </div>
+              <div className="flex sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 overflow-x-auto sm:overflow-visible px-2 sm:px-6 pb-2 sm:pb-0">
+                {(showAllGoogle ? googleResults : googleResults.slice(0, 8)).map((book, index) => (
+                  <div
+                    key={index}
+                    className="min-w-[200px] max-w-[240px] flex-shrink-0 sm:flex-shrink sm:w-full"
+                  >
+                    <GoogleSliderCard
+                      book={book}
+                      isLiked={likedBookIds.has(book.id)}
+                      onLike={toggleLike}
+                      onClick={() => window.open(book.volumeInfo?.infoLink, '_blank')}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
             {googleResults.length > 8 && (
               <button
                 onClick={() => setShowAllGoogle(!showAllGoogle)}
-                className="mt-4 px-4 sm:px-6 text-sm text-[#cd2126] hover:underline"
+                className="hidden sm:inline mt-4 text-sm px-4 sm:px-6 text-[#cd2126] hover:underline"
               >
                 {showAllGoogle ? 'See Less' : 'See More'}
               </button>
