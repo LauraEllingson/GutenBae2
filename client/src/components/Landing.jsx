@@ -13,7 +13,7 @@ import submark from '../assets/r_submark.png';
 
 const Landing = () => {
   return (
-    <section className="w-full max-w-6xl mx-auto px-4 py-16 mt-10 mb-10">
+    <section className="w-full max-w-6xl mx-auto px-4  mt-10 mb-10">
       <div className="flex flex-col md:flex-row md:items-start md:gap-12 text-center md:text-left">
         {/* Left Side */}
         <div className="flex-1 flex flex-col items-center md:items-start">
