@@ -29,7 +29,7 @@ const Registration = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gradient-to-b from-[#ccd8f6] via-[#0f3596] to-[#0f3596] px-4 pt-10">
+    <div className="min-h-screen flex flex-col items-center bg-gradient-to-b from-[#ccd8f6] via-[#0f3596] to-[#0f3596] px-4 pt-10 pb-12">
       {/* Logo */}
       <div className="flex flex-col items-center mb-6">
         <img src={submark} alt="Gutenbae Logo" className="w-28 mb-3" />
@@ -37,7 +37,7 @@ const Registration = () => {
           GUTENBAE
         </h1>
       </div>
-
+      
       {/* Form */}
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded-2xl shadow-md w-full max-w-sm space-y-4">
         <h2 className="text-lg font-semibold text-gray-700 text-center">Create an account</h2>
@@ -100,6 +100,16 @@ const Registration = () => {
           </span>
         </p>
       </form>
+
+      {/* Back Home Link */}
+      <div className="text-center mt-6">
+        <button
+          onClick={() => navigate("/")}
+          className="text-white underline text-sm hover:text-gray-200 transition"
+        >
+          ← Back Home
+        </button>
+      </div>
     </div>
   );
 };
