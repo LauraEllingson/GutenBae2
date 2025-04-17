@@ -47,18 +47,6 @@ const Nav = () => {
           </>
         ) : (
           <>
-            <Link
-              to="/dashboard"
-              className={`hover:text-[#cd2126] ${isActive('/dashboard') ? 'text-[#cd2126]' : 'text-gray-800'}`}
-            >
-              About
-            </Link>
-            <Link
-              to="/search"
-              className={`hover:text-[#cd2126] ${isActive('/search') ? 'text-[#cd2126]' : 'text-gray-800'}`}
-            >
-              How It Works
-            </Link>
             <Link to="/login" className="hover:text-[#cd2126] text-gray-800">
               Login
             </Link>
