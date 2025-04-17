@@ -2,8 +2,7 @@ import React from 'react';
 import {
   IconRead,
   IconShare,
-  IconHeart,
-  IconHeartOutline,
+
 } from '../utils/icons';
 
 const GoogleSliderCard = ({ book, isLiked, onLike, onClick }) => {
@@ -73,15 +72,7 @@ const GoogleSliderCard = ({ book, isLiked, onLike, onClick }) => {
         </div>
 
         {/* Like button */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onLike(book);
-          }}
-          title={isLiked ? 'Liked' : 'Like this book'}
-        >
-          {isLiked ? <IconHeart /> : <IconHeartOutline />}
-        </button>
+        
       </div>
     </div>
   );
