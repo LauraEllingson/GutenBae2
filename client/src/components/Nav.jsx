@@ -9,9 +9,8 @@ const Nav = () => {
   const { loggedIn, logout } = useAuth();
 
   const handleLogout = () => {
-    logout();
-    navigate('/login');
-    window.location.reload();
+    navigate('/');               // go home first
+    setTimeout(() => logout(), 10); // then clear token
   };
 
   const isActive = (path) => location.pathname === path;
