@@ -21,7 +21,6 @@ const Login = () => {
       .post("https://gutenbae2.onrender.com/login", { email, password })
       .then((response) => {
         localStorage.setItem("token", response.data.token);
-        alert("Login Successful!");
         navigate("/dashboard");
       })
       .catch(() => {
