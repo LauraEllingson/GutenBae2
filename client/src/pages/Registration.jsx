@@ -8,37 +8,47 @@ const Registration = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [message, setMessage] = useState(null);
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (!name || !email || !password) {
-      alert("Please fill in all fields");
+      setMessage("Please fill in all fields.");
+      setTimeout(() => setMessage(null), 3000);
       return;
     }
 
     axios.post('https://gutenbae2.onrender.com/register', { name, email, password })
       .then(() => {
-        alert("Registration Successful!");
-        navigate('/dashboard');
+        setMessage("Registration successful. Redirecting...");
+        setTimeout(() => {
+          setMessage(null);
+          navigate('/dashboard');
+        }, 1500);
       })
       .catch(() => {
-        alert("Error registering user!");
+        setMessage("Error registering user.");
+        setTimeout(() => setMessage(null), 3000);
       });
   };
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gradient-to-b from-[#ccd8f6] via-[#0f3596] to-[#0f3596] px-4 pt-10 pb-12">
-      {/* Logo */}
       <div className="flex flex-col items-center mb-6">
         <img src={submark} alt="Gutenbae Logo" className="w-28 mb-3" />
         <h1 className="text-4xl font-bold text-[#cd2126] tracking-wide" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
           GUTENBAE
         </h1>
       </div>
-      
-      {/* Form */}
+
+      {message && (
+        <div className="bg-blue-100 text-blue-800 text-sm px-4 py-2 mb-4 rounded-md text-center w-full max-w-sm">
+          {message}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded-2xl shadow-md w-full max-w-sm space-y-4">
         <h2 className="text-lg font-semibold text-gray-700 text-center">Create an account</h2>
 
@@ -101,7 +111,6 @@ const Registration = () => {
         </p>
       </form>
 
-      {/* Back Home Link */}
       <div className="text-center mt-6">
         <button
           onClick={() => navigate("/")}

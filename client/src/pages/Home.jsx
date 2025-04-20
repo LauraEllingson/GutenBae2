@@ -6,7 +6,8 @@ import Nav from '../components/Nav';
 import axios from 'axios';
 import GutenbergSliderCard from '../components/GutenbergSliderCard';
 import GoogleSliderCard from '../components/GoogleSliderCard';
-
+import { useSearch } from '../SearchContext';
+import { shareBook } from '../utils/shareBook';
 import logo from '../assets/logo.png';
 
 const truncateTitle = (title) => {
@@ -16,21 +17,21 @@ const truncateTitle = (title) => {
 
 const Home = () => {
   const navigate = useNavigate();
-  const [query, setQuery] = useState('');
-  const [freeResults, setFreeResults] = useState([]);
-  const [googleResults, setGoogleResults] = useState([]);
+  const {
+    query,
+    setQuery,
+    freeResults,
+    setFreeResults,
+    googleResults,
+    setGoogleResults,
+  } = useSearch();
+
   const [isLoading, setIsLoading] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const [likedBookIds, setLikedBookIds] = useState(new Set());
   const [likeMessage, setLikeMessage] = useState('');
   const [showAllFree, setShowAllFree] = useState(false);
   const [showAllGoogle, setShowAllGoogle] = useState(false);
-
-  const cleanTitle = (title) =>
-    title.replace(/\$b/g, '').replace(/[-–—]/g, '');
-
-  const capitalizeTitle = (title) =>
-    title.replace(/\b\w/g, (char) => char.toUpperCase());
 
   useEffect(() => {
     const fetchLikedBooks = () => {
@@ -54,15 +55,6 @@ const Home = () => {
     fetchLikedBooks();
     window.addEventListener('focus', fetchLikedBooks);
     return () => window.removeEventListener('focus', fetchLikedBooks);
-  }, []);
-
-  useEffect(() => {
-    const savedQuery = localStorage.getItem('lastQuery');
-    const savedFreeResults = localStorage.getItem('lastFreeResults');
-    const savedGoogleResults = localStorage.getItem('lastGoogleResults');
-    if (savedQuery) setQuery(savedQuery);
-    if (savedFreeResults) setFreeResults(JSON.parse(savedFreeResults));
-    if (savedGoogleResults) setGoogleResults(JSON.parse(savedGoogleResults));
   }, []);
 
   const handleSearch = async () => {
@@ -90,10 +82,6 @@ const Home = () => {
 
       setFreeResults(gutendexData.results || []);
       setGoogleResults(googleData.items || []);
-
-      localStorage.setItem('lastQuery', query);
-      localStorage.setItem('lastFreeResults', JSON.stringify(gutendexData.results || []));
-      localStorage.setItem('lastGoogleResults', JSON.stringify(googleData.items || []));
     } catch (error) {
       console.error('Search failed:', error);
     } finally {
@@ -101,14 +89,16 @@ const Home = () => {
     }
   };
 
+  const handleShare = (book) => shareBook(book, setLikeMessage);
+
   const toggleLike = async (book) => {
     const token = localStorage.getItem('token');
-    if (!token) return alert('Please log in to like a book');
+    if (!token) return;
 
     const id = book.id || book.bookId;
 
     if (likedBookIds.has(id)) {
-      setLikeMessage('❤️ You already liked this book');
+      setLikeMessage('You already liked this book');
       setTimeout(() => setLikeMessage(''), 2000);
       return;
     }
@@ -131,7 +121,8 @@ const Home = () => {
       setLikeMessage('Book liked and saved to your library!');
       setTimeout(() => setLikeMessage(''), 3000);
     } catch (error) {
-      alert('Error! Book cannot be liked twice, it is already in your library.');
+      setLikeMessage('This book is already in your library.');
+      setTimeout(() => setLikeMessage(''), 3000);
     }
   };
 
@@ -164,25 +155,26 @@ const Home = () => {
               Free from Project Gutenberg
             </h2>
             <div className="relative">
-  <div className="flex sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 overflow-x-auto sm:overflow-visible px-2 sm:px-6 pb-2 sm:pb-0">
-    {(showAllFree ? freeResults : freeResults.slice(0, 8)).map((book, index) => (
-      <div
-        key={index}
-        className="min-w-[200px] max-w-[240px] flex-shrink-0 sm:flex-shrink sm:w-full"
-      >
-        <GutenbergSliderCard
-          book={book}
-          isLiked={likedBookIds.has(book.id || book.bookId)}
-          onLike={toggleLike}
-          onClick={() => navigate(`/shared-book/${book.id}`)}
-        />
-      </div>
-    ))}
-  </div>
-  <div className="sm:hidden text-gray-400 text-xs text-right pr-4 mt-2">
-    ← Swipe to see more
-  </div>
-</div>
+              <div className="flex sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 overflow-x-auto sm:overflow-visible px-2 sm:px-6 pb-2 sm:pb-0">
+                {(showAllFree ? freeResults : freeResults.slice(0, 8)).map((book, index) => (
+                  <div
+                    key={index}
+                    className="min-w-[200px] max-w-[240px] flex-shrink-0 sm:flex-shrink sm:w-full"
+                  >
+                    <GutenbergSliderCard
+                      book={book}
+                      isLiked={likedBookIds.has(book.id || book.bookId)}
+                      onLike={toggleLike}
+                      onShare={() => handleShare(book)}
+                      onClick={() => navigate(`/shared-book/${book.id}`)}
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="sm:hidden text-gray-400 text-xs text-right pr-4 mt-2">
+                ← Swipe to see more
+              </div>
+            </div>
 
             {freeResults.length > 8 && (
               <button
@@ -201,25 +193,25 @@ const Home = () => {
               Google Results
             </h2>
             <div className="relative">
-  <div className="flex sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 overflow-x-auto sm:overflow-visible px-2 sm:px-6 pb-2 sm:pb-0">
-    {(showAllGoogle ? googleResults : googleResults.slice(0, 8)).map((book, index) => (
-      <div
-        key={index}
-        className="min-w-[200px] max-w-[240px] flex-shrink-0 sm:flex-shrink sm:w-full"
-      >
-        <GoogleSliderCard
-          book={book}
-          isLiked={likedBookIds.has(book.id)}
-          onLike={toggleLike}
-          onClick={() => window.open(book.volumeInfo?.infoLink, '_blank')}
-        />
-      </div>
-    ))}
-  </div>
-  <div className="sm:hidden text-gray-400 text-xs text-right pr-4 mt-2">
-    ← Swipe to see more
-  </div>
-</div>
+              <div className="flex sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 overflow-x-auto sm:overflow-visible px-2 sm:px-6 pb-2 sm:pb-0">
+                {(showAllGoogle ? googleResults : googleResults.slice(0, 8)).map((book, index) => (
+                  <div
+                    key={index}
+                    className="min-w-[200px] max-w-[240px] flex-shrink-0 sm:flex-shrink sm:w-full"
+                  >
+                    <GoogleSliderCard
+                      book={book}
+                      isLiked={likedBookIds.has(book.id)}
+                      onLike={toggleLike}
+                      onClick={() => window.open(book.volumeInfo?.infoLink, '_blank')}
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="sm:hidden text-gray-400 text-xs text-right pr-4 mt-2">
+                ← Swipe to see more
+              </div>
+            </div>
 
             {googleResults.length > 8 && (
               <button

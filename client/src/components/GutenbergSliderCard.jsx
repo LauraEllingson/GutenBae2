@@ -9,7 +9,7 @@ import {
   IconRead,
 } from '../utils/icons';
 
-const GutenbergSliderCard = ({ book, isLiked, onLike, onClick }) => {
+const GutenbergSliderCard = ({ book, isLiked, onLike, onClick, onShare }) => {
   const title = book.title;
   const authorsList = book.authors?.map((a) => a.name) || [];
 const authors =
@@ -22,22 +22,8 @@ const authors =
   const epubLink = book.formats?.['application/epub+zip'];
   const htmlLink = book.formats?.['text/html'];
   const kindleLink = book.formats?.['application/x-mobipocket-ebook'];
-
-  const handleShare = (e) => {
-    e.stopPropagation();
-    if (navigator.share) {
-      navigator
-        .share({
-          title: book.title,
-          url: window.location.href,
-        })
-        .catch(() => {
-          alert('Sharing failed or not supported.');
-        });
-    } else {
-      alert('Sharing not supported in this browser.');
-    }
-  };
+  
+  
 
   return (
     <div
@@ -97,13 +83,16 @@ const authors =
             </a>
           )}
 
-          <button
-            onClick={handleShare}
-            title="Share"
-            className="hover:opacity-80"
-          >
-            <IconShare />
-          </button>
+<button
+  onClick={(e) => {
+    e.stopPropagation();
+    onShare(); // delegate to parent
+  }}
+  title="Share"
+  className="hover:opacity-80"
+>
+  <IconShare />
+</button>
         </div>
 
         {/* Like button */}

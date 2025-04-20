@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { formatMultilineTitle } from '../utils/formatMultilineTitle';
+import { shareBook } from '../utils/shareBook';
 import Nav from '../components/Nav';
 import {
   IconRead,
@@ -12,10 +13,12 @@ import {
   IconHeartOutline,
 } from "../utils/icons";
 
+
 const PublicBookDetail = () => {
   const { id } = useParams();
   const [book, setBook] = useState(null);
   const [error, setError] = useState(null);
+  const [message, setMessage] = useState(null);
   const [liked, setLiked] = useState(false);
   const [likedBookIds, setLikedBookIds] = useState(new Set());
 
@@ -47,28 +50,21 @@ const PublicBookDetail = () => {
       });
   }, [id, likedBookIds]);
 
-  const handleShare = () => {
-    if (!book) return;
-    const detailURL = `${window.location.origin}/shared-book/${book.id}`;
-    if (navigator.share) {
-      navigator.share({
-        title: book.title,
-        text: `Check out this book: ${book.title} by ${book.authors.map(a => a.name).join(", ")}`,
-        url: detailURL,
-      }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(detailURL);
-      alert("Link copied to clipboard!");
-    }
-  };
+  const handleShare = (book) => shareBook(book, setLikeMessage);
 
   const toggleLike = async () => {
     const token = localStorage.getItem("token");
-    if (!token) return alert("Please log in to like this book");
+    if (!token) {
+      setMessage("Please log in to like this book.");
+      setTimeout(() => setMessage(null), 3000);
+      return;
+    }
+
     if (!book) return;
 
     if (likedBookIds.has(book.id)) {
-      alert("Error! Book is already in your library.");
+      setMessage("This book is already in your library.");
+      setTimeout(() => setMessage(null), 3000);
       return;
     }
 
@@ -88,9 +84,11 @@ const PublicBookDetail = () => {
 
       setLiked(true);
       setLikedBookIds((prev) => new Set(prev).add(book.id));
-      alert("Book liked and saved to your library!");
-    } catch (error) {
-      alert("Error! Could not like the book.");
+      setMessage("Book saved to your library.");
+      setTimeout(() => setMessage(null), 3000);
+    } catch {
+      setMessage("Could not save the book.");
+      setTimeout(() => setMessage(null), 3000);
     }
   };
 
@@ -105,6 +103,11 @@ const PublicBookDetail = () => {
     <>
       <Nav />
       <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        {message && (
+          <div className="bg-blue-100 text-blue-800 text-sm px-4 py-2 rounded-md mb-4 text-center">
+            {message}
+          </div>
+        )}
 
         <div className="text-sm sm:text-base text-gray-800 leading-relaxed max-w-4xl mx-auto">
           <h1 className="mb-2">
@@ -161,9 +164,13 @@ const PublicBookDetail = () => {
                 <IconKindle className="inline mr-1" /> Kindle
               </a>
             )}
-            <button onClick={handleShare} className="underline" title="Share">
-              <IconShare className="inline mr-1" /> Share
-            </button>
+            <button
+  onClick={() => shareBook(book, setMessage)}
+  className="underline"
+  title="Share"
+>
+  <IconShare className="inline mr-1" /> Share
+</button>
             <button onClick={toggleLike} className="text-[#cd2126] text-lg" title="Like">
               {liked ? <IconHeart /> : <IconHeartOutline />}
             </button>

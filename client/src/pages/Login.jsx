@@ -7,13 +7,15 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState(null); 
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (!email || !password) {
-      alert("Please fill in all fields");
+      setError("Please fill in all fields.");
+      setTimeout(() => setError(null), 3000);
       return;
     }
 
@@ -24,7 +26,8 @@ const Login = () => {
         navigate("/dashboard");
       })
       .catch(() => {
-        alert("Error logging in");
+        setError("Error logging in. Please check your credentials.");
+        setTimeout(() => setError(null), 3000);
       });
   };
 
@@ -38,6 +41,13 @@ const Login = () => {
         >
           GUTENBAE
         </h1>
+
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-100 text-red-700 text-sm px-4 py-2 mb-4 rounded-md text-center w-full">
+            {error}
+          </div>
+        )}
 
         <form
           onSubmit={handleSubmit}
@@ -86,20 +96,17 @@ const Login = () => {
             Sign up
           </button>
         </form>
-        </div>
+      </div>
 
-<div className="text-center mt-6">
-  <button
-    onClick={() => navigate("/")}
-    className="text-white underline text-sm hover:text-gray-200 transition"
-  >
-    ← Back Home
-  </button>
-</div>
-</div>
-
-    
-    
+      <div className="text-center mt-6">
+        <button
+          onClick={() => navigate("/")}
+          className="text-white underline text-sm hover:text-gray-200 transition"
+        >
+          ← Back Home
+        </button>
+      </div>
+    </div>
   );
 };
 
