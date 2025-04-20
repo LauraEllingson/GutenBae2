@@ -11,8 +11,7 @@ export const shareBook = (book, setMessage) => {
         text: `Check out this book: ${title} by ${authors}`,
         url,
       }).catch(() => {
-        setMessage?.("Sharing failed or was canceled.");
-        setTimeout(() => setMessage?.(null), 3000);
+        
       });
     } else {
       navigator.clipboard.writeText(url)
