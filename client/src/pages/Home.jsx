@@ -140,14 +140,16 @@ const Home = () => {
           <p className="text-green-600 text-sm mb-4">{likeMessage}</p>
         )}
 
-        <SearchBar
-          query={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSearch();
-          }}
-        />
+<SearchBar
+  query={query}
+  onChange={(e) => setQuery(e.target.value)}
+  onSubmit={(e) => {
+    e.preventDefault();
+    handleSearch();
+  }}
+  isLoading={isLoading}
+/>
+
 
         {freeResults.length > 0 && (
           <section className="w-full mb-10 bg-white rounded-xl p-4">
