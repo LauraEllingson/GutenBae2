@@ -1,16 +1,93 @@
 # GutenBae2
-GutenBae is an app that allows users to search for books using Gutendex Api and Google Books Api. Books available through the Gutendex Api will have download and share options. The app also features login, where users can save titles from their search results into a library. Future upgrades will include the option to categorize the library and add reviews.
+GutenBae is a modern book discovery app that allows users to search for and save books using the Gutendex API and Google Books API. It combines the free accessibility of public domain texts with the reach of Google Books, letting users preview, download, and save books to a personal library. The app emphasizes simplicity, accessibility, and a clean design to make discovering classic literature feel modern and user-friendly.
 
-Features
+## Live Site
+https://gutenbae2.onrender.com
 
-Public Search & Explore – Find books by title, author, or genre using integrated APIs.
+## Screenshots
+### Landing + Search Page
+![Landing and Search Page](./client/src/assets/landing.png)
 
-Download option for books in the public domain.
+### Search Results 
+![Gutenberg Results](./client/src/assets/searchresults.png)
 
-Login & Authentication – Securely sign up and log in to access personalized features
+### User Dashboard (Liked Books)
+![Dashboard](./client/src/assets/dashboard.png)
 
-Library - save books to personalized library.
 
-Wishlist & Favorites – Keep track of books you want to read in the future.
+## Features
+- Public Search & Explore – Search by title, author, keyword, or genre using integrated APIs.
 
-see app here:  https://gutenbae2.onrender.com/
+- Book Downloads – Instantly download EPUB, Kindle, or HTML versions of public domain books.
+
+- Preview & Share – Read online and share public links with others.
+
+- Login & Authentication – Securely create an account and log in using JWT-based authentication.
+
+- Personal Library – Save favorite books to your dashboard for later reading or downloading.
+
+## Wishlist – Keep track of books you'd like to read in the future.
+
+- Responsive UI – Optimized for mobile, tablet, and desktop devices.
+
+## In Progress / Coming Soon
+- Featured/Explore page for easier discovery based on interests
+
+- Rate and review titles on public detail page
+
+- Dynamic metadata for better SEO and shared previews
+
+- Save Google Book results to user libraries
+
+- Upload custom book covers
+
+- Categorize saved books with user-created tags or shelves
+
+- Password recovery and account deletion
+
+- Additional free book resources beyond Gutendex and Google
+
+- FAQ and help guide for downloading to mobile or Kindle
+
+## Running the App Locally
+1. Clone the repository
+
+git clone https://github.com/LauraEllingson/GutenBae2.git
+
+2. cd GutenBae2
+
+### Set up the server
+
+3. cd server
+4. npm install
+5. Create a .env file in the server/ directory with the following:
+
+- MONGO_URI=your_mongodb_connection_string
+- JWT_SECRET=your_jwt_secret
+
+### Start the server:
+
+6. npm run start
+
+### Set up the client
+
+In a new terminal tab or window:
+
+7. cd client
+8. npm install
+9. npm run dev
+10. The app will be available at http://localhost:5173
+
+## Contributing
+Contributions are welcome. To contribute:
+
+1. Fork the repository
+
+2. Create a new branch (git checkout -b feature-name)
+
+3. Commit your changes (git commit -m "Add feature")
+
+4. Push to the branch (git push origin feature-name)
+
+5. Open a pull request
+

@@ -7,7 +7,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState(null); 
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
@@ -42,9 +42,13 @@ const Login = () => {
           GUTENBAE
         </h1>
 
-        {/* Error Message */}
+        {/* Error Message with aria-live */}
         {error && (
-          <div className="bg-red-100 text-red-700 text-sm px-4 py-2 mb-4 rounded-md text-center w-full">
+          <div
+            className="bg-red-100 text-red-700 text-sm px-4 py-2 mb-4 rounded-md text-center w-full"
+            role="alert"
+            aria-live="polite"
+          >
             {error}
           </div>
         )}
@@ -57,27 +61,49 @@ const Login = () => {
             Login to your account
           </h2>
 
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="rounded-lg px-4 py-3 text-sm border border-gray-300 focus:outline-none"
-          />
-
-          <input
-            type={showPassword ? "text" : "password"}
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="rounded-lg px-4 py-3 text-sm border border-gray-300 focus:outline-none"
-          />
-
-          <label className="flex items-center gap-2 text-xs text-gray-600 -mt-2">
+          <div className="text-left">
+            <label htmlFor="email" className="block text-sm text-gray-700 mb-1">
+              Email Address
+            </label>
             <input
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="rounded-lg px-4 py-3 text-sm border border-gray-300 focus:outline-none w-full"
+              required
+            />
+          </div>
+
+          <div className="text-left">
+            <label
+              htmlFor="password"
+              className="block text-sm text-gray-700 mb-1"
+            >
+              Password
+            </label>
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="rounded-lg px-4 py-3 text-sm border border-gray-300 focus:outline-none w-full"
+              required
+            />
+          </div>
+
+          <label
+            htmlFor="show-password"
+            className="flex items-center gap-2 text-xs text-gray-600 -mt-2 cursor-pointer"
+          >
+            <input
+              id="show-password"
               type="checkbox"
               checked={showPassword}
               onChange={() => setShowPassword(!showPassword)}
+              aria-checked={showPassword}
             />
             Show password
           </label>
@@ -103,7 +129,7 @@ const Login = () => {
           onClick={() => navigate("/")}
           className="text-white underline text-sm hover:text-gray-200 transition"
         >
-          ← Back Home
+          Back Home
         </button>
       </div>
     </div>
