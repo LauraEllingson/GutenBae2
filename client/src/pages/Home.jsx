@@ -93,7 +93,11 @@ const Home = () => {
 
   const toggleLike = async (book) => {
     const token = localStorage.getItem('token');
-    if (!token) return;
+    if (!token) {
+      setLikeMessage('Please log in to like books.');
+      setTimeout(() => setLikeMessage(''), 3000);
+      return;
+    }
 
     const id = book.id || book.bookId;
 
