@@ -9,6 +9,9 @@ import { fileURLToPath } from "url";
 import UserModel from "./models/User.js";
 import jwt from "jsonwebtoken";
 import LikedBook from './models/LikedBooks.js';
+import Review from "./models/Review.js";
+
+
 
 const app = express();
 app.use(express.json());
@@ -59,6 +62,46 @@ const authenticateToken = (req, res, next) => {
 app.post("/verify-token", authenticateToken, (req, res) => {
   res.json({ user: req.user });
 });
+// GET /reviews/:bookId (public)
+app.get("/reviews/:bookId", async (req, res) => {
+  try {
+    const bookId = Number(req.params.bookId);
+    if (Number.isNaN(bookId)) return res.status(400).json({ message: "Invalid bookId" });
+    const reviews = await Review.find({ bookId }).sort({ createdAt: -1 }).lean();
+    res.json({ reviews });
+  } catch {
+    res.status(500).json({ message: "Failed to fetch reviews" });
+  }
+});
+
+// POST /reviews (auth)
+app.post("/reviews", authenticateToken, async (req, res) => {
+  try {
+    const { bookId, rating, text } = req.body;
+    const numericBookId = Number(bookId);
+    const numericRating = Number(rating);
+    if (!numericBookId || !numericRating) {
+      return res.status(400).json({ message: "bookId and rating are required" });
+    }
+    if (numericRating < 1 || numericRating > 5) {
+      return res.status(400).json({ message: "rating must be between 1 and 5" });
+    }
+    const review = await Review.create({
+      bookId: numericBookId,
+      userId: req.user._id,
+      userName: req.user.name || "",
+      rating: numericRating,
+      text: (text || "").toString().trim(),
+    });
+    res.status(201).json({ review });
+  } catch (e) {
+    if (e.code === 11000) {
+      return res.status(409).json({ message: "You already reviewed this book." });
+    }
+    res.status(500).json({ message: "Failed to create review" });
+  }
+});
+
 
 app.post("/like-book", authenticateToken, async (req, res) => {
   const { bookId, title, authors, imageUrl, description, formats } = req.body;
@@ -125,6 +168,10 @@ app.get("/liked-book/:id", async (req, res) => {
     res.json({ error: "Failed to load book details" });
   }
 });
+
+
+
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
