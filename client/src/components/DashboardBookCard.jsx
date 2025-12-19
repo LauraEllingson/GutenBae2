@@ -32,8 +32,15 @@ const DashboardBookCard = ({
   onClick,
   onDelete,
   onShare,
+  // optional review object for the current user
+  review,
+  onDeleteReview,
+  onUpdateReview,
 }) => {
   const [truncateLength, setTruncateLength] = useState(160);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editText, setEditText] = useState("");
+  const [editRating, setEditRating] = useState(5);
 
   useEffect(() => {
     const updateTruncateLength = () => {
@@ -58,9 +65,23 @@ const DashboardBookCard = ({
   const authors = book.authors?.join(', ') || 'Unknown';
   const summary = truncateText(book.description || 'No description available.', truncateLength);
 
+  useEffect(() => {
+    if (review) {
+      setEditText(review.text || "");
+      setEditRating(review.rating || 5);
+    }
+  }, [review]);
+  const MAX_REVIEW_CHARS = 1200;
+  const clampText = (text) => (text && text.length > MAX_REVIEW_CHARS ? text.slice(0, MAX_REVIEW_CHARS) : text || "");
+  const countParagraphs = (text) => {
+    const s = (text || "").toString().trim();
+    if (!s) return 0;
+    return s.split(/\n\s*\n/).filter(Boolean).length;
+  };
+
   return (
     <div
-      className="w-full max-w-[300px] h-auto border border-gray-200 shadow-sm bg-white p-4 hover:shadow-md transition cursor-pointer flex flex-col items-start text-left"
+      className="w-full max-w-[300px] h-auto shadow-sm bg-white p-4 hover:shadow-md transition cursor-pointer flex flex-col items-start text-left"
       onClick={onClick}
     >
       {/* Image */}
@@ -88,7 +109,7 @@ const DashboardBookCard = ({
       </p>
 
       {/* Icons with labels */}
-      <div className="mt-auto pt-2 w-full flex flex-wrap justify-start gap-4 text-red-600 text-sm">
+  <div className="mt-auto pt-2 w-full flex flex-wrap justify-start gap-4 text-red-600 text-sm">
         {book.formats?.['text/html'] && (
           <div className="flex flex-col items-center">
             <a
@@ -160,6 +181,91 @@ const DashboardBookCard = ({
           </button>
           <span className="text-xs mt-1">Remove</span>
         </div>
+        {/* User's review summary and actions */}
+        {review && (
+          <div className="w-full mt-2">
+            {!isEditing ? (
+              <div className="text-left text-xs text-gray-700 mb-2">
+                <div className="flex items-center justify-between">
+                  <div className="font-semibold text-sm">Your review</div>
+                  <div className="text-sm text-yellow-600">{review.rating} / 5</div>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">{truncateText(review.text || '', 140)}</p>
+                <div className="flex gap-2 mt-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsEditing(true);
+                    }}
+                    className="text-xs text-blue-600 hover:underline"
+                  >
+                    Edit Review
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteReview && onDeleteReview(review._id);
+                    }}
+                    className="text-xs text-red-600 hover:underline"
+                  >
+                    Delete Review
+                  </button>
+                </div>
+              </div>
+            ) : (
+                <div className="w-full text-left mt-2">
+                <label className="text-xs">Rating</label>
+                <select
+                  value={editRating}
+                    onChange={(e) => setEditRating(Number(e.target.value))}
+                  className="block mt-1 text-sm p-1 rounded"
+                >
+                  <option value={1}>1</option>
+                  <option value={2}>2</option>
+                  <option value={3}>3</option>
+                  <option value={4}>4</option>
+                  <option value={5}>5</option>
+                </select>
+                <label className="text-xs mt-2 block">Review</label>
+                <textarea
+                  value={editText}
+                  onChange={(e) => setEditText(clampText(e.target.value))}
+                  rows={3}
+                  className="w-full mt-1 text-sm p-1 rounded"
+                />
+                <div className="mt-1 flex justify-between text-xs text-gray-500">
+                  <div>{(editText || "").length}/{MAX_REVIEW_CHARS} chars</div>
+                  <div>{countParagraphs(editText)} / 3 paragraphs</div>
+                </div>
+                <div className="flex gap-2 mt-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // call update handler
+                      onUpdateReview && onUpdateReview(review._id, { rating: editRating, text: editText });
+                      setIsEditing(false);
+                    }}
+                    className="text-xs bg-[#cd2126] text-white px-2 py-1 rounded"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsEditing(false);
+                      // reset edits
+                      setEditText(review.text || "");
+                      setEditRating(review.rating || 5);
+                    }}
+                    className="text-xs px-2 py-1 rounded"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
