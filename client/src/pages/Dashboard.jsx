@@ -11,6 +11,7 @@ import DashboardBookCard from "../components/DashboardBookCard";
 import GutenbergSliderCard from "../components/GutenbergSliderCard";
 // GoogleSliderCard removed — Google Books API usage removed
 import { shareBook } from "../utils/shareBook";
+import { suggestCorrection } from '../utils/didYouMean';
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://gutenbae2.onrender.com";
 const Dashboard = () => {
@@ -60,6 +61,7 @@ const Dashboard = () => {
     title.replace(/\b\w/g, (char) => char.toUpperCase());
   const [selectedTab, setSelectedTab] = useState('liked'); // 'liked' | 'reviews' | 'profile'
   const { query, setQuery, freeResults, setFreeResults } = useSearch();
+  const [didYouMean, setDidYouMean] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [searchExpanded, setSearchExpanded] = useState(true);
 
@@ -75,7 +77,14 @@ const Dashboard = () => {
       const gutendexResponse = await fetch(gutendexApiUrl);
       if (!gutendexResponse.ok) throw new Error('API error');
       const gutendexData = await gutendexResponse.json();
-      setFreeResults(gutendexData.results || []);
+      const results = gutendexData.results || [];
+      setFreeResults(results);
+      if (results.length === 0) {
+        const suggestion = await suggestCorrection(query);
+        setDidYouMean(suggestion);
+      } else {
+        setDidYouMean(null);
+      }
     } catch (error) {
       console.error('Search failed:', error);
     } finally {
@@ -369,6 +378,22 @@ const Dashboard = () => {
           }}
           isLoading={isLoading}
         />
+
+        {didYouMean && (
+          <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8 mt-2 text-sm text-gray-700">
+            Did you mean:{' '}
+            <button
+              className="underline text-[#cd2126]"
+              onClick={async () => {
+                setQuery(didYouMean);
+                setDidYouMean(null);
+                await handleSearch();
+              }}
+            >
+              {didYouMean}
+            </button>
+          </div>
+        )}
 
         <div className="w-full max-w-7xl bg-white min-h-screen px-4 sm:px-6 md:px-8 py-6">
           {/* Search results panel shown on Dashboard when search returns results */}

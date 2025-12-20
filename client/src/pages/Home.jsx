@@ -7,6 +7,7 @@ import axios from 'axios';
 import GutenbergSliderCard from '../components/GutenbergSliderCard';
 import { useSearch } from '../SearchContext';
 import { shareBook } from '../utils/shareBook';
+import { suggestCorrection } from '../utils/didYouMean';
 import logo from '../assets/logo.png';
 
 const truncateTitle = (title) => {
@@ -24,6 +25,7 @@ const Home = () => {
   } = useSearch();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [didYouMean, setDidYouMean] = useState(null);
   const [loggedIn, setLoggedIn] = useState(false);
   const [likedBookIds, setLikedBookIds] = useState(new Set());
   const [likeMessage, setLikeMessage] = useState('');
@@ -68,7 +70,15 @@ const Home = () => {
       const gutendexResponse = await fetch(gutendexApiUrl);
       if (!gutendexResponse.ok) throw new Error('API error');
       const gutendexData = await gutendexResponse.json();
-      setFreeResults(gutendexData.results || []);
+      const results = gutendexData.results || [];
+      setFreeResults(results);
+      if ((results || []).length === 0) {
+        // try to find a correction suggestion
+        const suggestion = await suggestCorrection(query);
+        setDidYouMean(suggestion);
+      } else {
+        setDidYouMean(null);
+      }
     } catch (error) {
       console.error('Search failed:', error);
     } finally {
@@ -140,6 +150,22 @@ const Home = () => {
   }}
   isLoading={isLoading}
 />
+
+        {didYouMean && (
+          <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 mt-2 text-sm text-gray-700">
+            Did you mean:{' '}
+            <button
+              className="underline text-[#cd2126]"
+              onClick={async () => {
+                setQuery(didYouMean);
+                setDidYouMean(null);
+                await handleSearch();
+              }}
+            >
+              {didYouMean}
+            </button>
+          </div>
+        )}
 
 
         {freeResults.length > 0 && (
