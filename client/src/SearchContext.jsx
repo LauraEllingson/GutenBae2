@@ -6,7 +6,7 @@ const SearchContext = createContext();
 export const SearchProvider = ({ children }) => {
   const [query, setQuery] = useState('');
   const [freeResults, setFreeResults] = useState([]);
-  const [googleResults, setGoogleResults] = useState([]);
+  // googleResults removed per request to stop using Google Books API
   const [likedBookIds, setLikedBookIds] = useState(new Set());
   const [likedBookMap, setLikedBookMap] = useState({}); // bookId -> likedDocId
   const [likedBookDocs, setLikedBookDocs] = useState({}); // bookId -> likedBook doc
@@ -119,7 +119,7 @@ export const SearchProvider = ({ children }) => {
 
   return (
     <SearchContext.Provider
-      value={{ query, setQuery, freeResults, setFreeResults, googleResults, setGoogleResults, likedBookIds, setLikedBookIds, likedBookMap, setLikedBookMap, likedBookDocs, setLikedBookDocs, toggleLike }}
+      value={{ query, setQuery, freeResults, setFreeResults, likedBookIds, setLikedBookIds, likedBookMap, setLikedBookMap, likedBookDocs, setLikedBookDocs, toggleLike }}
     >
       {children}
     </SearchContext.Provider>

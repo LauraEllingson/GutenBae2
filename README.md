@@ -1,5 +1,5 @@
 # GutenBae2
-GutenBae is a modern book discovery app that allows users to search for and save books using the Gutendex API and Google Books API. It combines the free accessibility of public domain texts with the reach of Google Books, letting users preview, download, and save books to a personal library. The app emphasizes simplicity, accessibility, and a clean design to make discovering classic literature feel modern and user-friendly.
+GutenBae is a modern book discovery app that allows users to search for and save books using the Gutendex API. It focuses on public-domain texts and makes discovering, previewing, and downloading classic literature simple and user-friendly.
 
 ## Live Site
 https://gutenbae2.onrender.com
@@ -37,15 +37,13 @@ https://gutenbae2.onrender.com
 
 - Dynamic metadata for better SEO and shared previews
 
-- Save Google Book results to user libraries
-
 - Upload custom book covers
 
 - Categorize saved books with user-created tags or shelves
 
 - Password recovery and account deletion
 
-- Additional free book resources beyond Gutendex and Google
+- Additional free book resources beyond Gutendex
 
 - FAQ and help guide for downloading to mobile or Kindle
 

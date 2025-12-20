@@ -9,7 +9,7 @@ import { useAuth } from "../AuthContext";
 import logo from "../assets/logo.png";
 import DashboardBookCard from "../components/DashboardBookCard";
 import GutenbergSliderCard from "../components/GutenbergSliderCard";
-import GoogleSliderCard from "../components/GoogleSliderCard";
+// GoogleSliderCard removed — Google Books API usage removed
 import { shareBook } from "../utils/shareBook";
 
 const API_BASE = import.meta.env.VITE_API_URL || "https://gutenbae2.onrender.com";
@@ -59,29 +59,23 @@ const Dashboard = () => {
   const capitalizeTitle = (title) =>
     title.replace(/\b\w/g, (char) => char.toUpperCase());
   const [selectedTab, setSelectedTab] = useState('liked'); // 'liked' | 'reviews' | 'profile'
-  const { query, setQuery, freeResults, setFreeResults, googleResults, setGoogleResults } = useSearch();
+  const { query, setQuery, freeResults, setFreeResults } = useSearch();
   const [isLoading, setIsLoading] = useState(false);
   const [searchExpanded, setSearchExpanded] = useState(true);
 
   const handleSearch = async () => {
     if (!query || !query.trim()) {
       setFreeResults([]);
-      setGoogleResults([]);
+      // googleResults removed
       return;
     }
     setIsLoading(true);
     const gutendexApiUrl = `https://gutendex.com/books/?search=${encodeURIComponent(query)}&page_size=10`;
-    const googleApiUrl = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}`;
     try {
-      const [gutendexResponse, googleResponse] = await Promise.all([
-        fetch(gutendexApiUrl),
-        fetch(googleApiUrl),
-      ]);
-      if (!gutendexResponse.ok || !googleResponse.ok) throw new Error('API error');
+      const gutendexResponse = await fetch(gutendexApiUrl);
+      if (!gutendexResponse.ok) throw new Error('API error');
       const gutendexData = await gutendexResponse.json();
-      const googleData = await googleResponse.json();
       setFreeResults(gutendexData.results || []);
-      setGoogleResults(googleData.items || []);
     } catch (error) {
       console.error('Search failed:', error);
     } finally {
@@ -378,7 +372,7 @@ const Dashboard = () => {
 
         <div className="w-full max-w-7xl bg-white min-h-screen px-4 sm:px-6 md:px-8 py-6">
           {/* Search results panel shown on Dashboard when search returns results */}
-          {(freeResults?.length > 0 || googleResults?.length > 0) && (
+          {(freeResults?.length > 0) && (
             <div className="w-full mb-6">
               <div className="flex items-center justify-end mb-2">
                 <button
@@ -424,25 +418,7 @@ const Dashboard = () => {
                     </section>
                   )}
 
-                  {googleResults?.length > 0 && (
-                    <section className="w-full">
-                      <h2 className="text-[#cd2126] font-[500] text-sm mb-2">Google Results</h2>
-                      <div className="relative">
-                        <div className="flex gap-4 overflow-x-auto no-scrollbar px-2 pb-2">
-                          {googleResults.map((book, index) => (
-                            <div key={book.id || index} className="min-w-[200px] max-w-[240px] flex-shrink-0">
-                              <GoogleSliderCard
-                                book={book}
-                                isLiked={false}
-                                onLike={() => {}}
-                                onClick={() => window.open(book.volumeInfo?.infoLink, '_blank')}
-                              />
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </section>
-                  )}
+                  {/* Google results removed */}
                 </>
               )}
             </div>

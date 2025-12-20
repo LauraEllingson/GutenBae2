@@ -27,9 +27,8 @@ const Landing = () => {
             <div className="text-2xl italic mt-1">More Accessible</div>
           </h2>
           <p className="text-gray-700 text-base font-fira leading-relaxed mt-6 max-w-xl">
-            Gutenbae combines the power of two APIs to bring you the widest range of reading options.
+            Gutenbae focuses on bringing the best of public-domain literature to you.
             With Project Gutenberg’s API (Gutendex), you can access over 75,000 books in the public domain—completely free.
-            We also tap into the Google Books API, because let’s face it—sometimes you want something new, modern, or trending.
             <br /><br />
             Dive in now and discover your next favorite title!
           </p>
