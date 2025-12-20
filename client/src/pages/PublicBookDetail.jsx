@@ -12,6 +12,8 @@ import {
   IconShare,
   IconHeart,
   IconHeartOutline,
+  IconTrash,
+  IconEdit,
 } from "../utils/icons";
 
 // Use the Vite-provided API URL when available so dev/prod builds behave the same
@@ -648,10 +650,7 @@ const PublicBookDetail = () => {
                               aria-label="Edit review"
                               title="Edit review"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path d="M17.414 2.586a2 2 0 0 0-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 0 0 0-2.828z" />
-                                <path d="M2 15.25V18h2.75l8.485-8.485-2.75-2.75L2 15.25z" />
-                              </svg>
+                              <IconEdit className="text-sm" />
                             </button>
                             <button
                               onClick={() => handleDeleteReview(r._id)}
@@ -659,9 +658,7 @@ const PublicBookDetail = () => {
                               aria-label="Delete review"
                               title="Delete review"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H3a1 1 0 100 2h14a1 1 0 100-2h-2V3a1 1 0 00-1-1H6zm2 6a1 1 0 10-2 0v7a1 1 0 001 1h6a1 1 0 001-1V8a1 1 0 10-2 0v6H8V8z" clipRule="evenodd" />
-                              </svg>
+                              <IconTrash className="text-sm text-red-600" />
                             </button>
                           </div>
                         </>

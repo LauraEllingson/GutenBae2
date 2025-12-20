@@ -8,7 +8,7 @@ import {
     FaFire,
   } from 'react-icons/fa';
 
-  import { HiOutlineCursorClick } from 'react-icons/hi';
+  import { HiOutlineCursorClick, HiPencil } from 'react-icons/hi';
   
   import {
     HiDocumentArrowDown,
@@ -22,6 +22,9 @@ import {
   export const IconKindle = (props) => <FaFire className="text-lg" {...props} />;
   export const IconShare = (props) => <HiPaperAirplane className="text-lg" {...props} />;
   export const IconTrash = (props) => <FaTrash className="text-lg text-red-600" {...props} />;
+
+  // Edit icon (pencil)
+  export const IconEdit = (props) => <HiPencil className="text-lg" {...props} />;
   
   // Heart/Like icons
   export const IconHeart = (props) => <FaHeart className="text-lg text-red-600" {...props} />;

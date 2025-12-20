@@ -46,7 +46,7 @@ const authors =
 
       <div className="flex items-center justify-between mt-3">
         {/* Left icon group */}
-        <div className="flex gap-3 items-center text-red-600 text-lg">
+        <div className="flex gap-3 items-center text-red-600">
           {htmlLink && (
             <a
               href={htmlLink}
@@ -55,7 +55,7 @@ const authors =
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
             >
-              <IconRead />
+              <IconRead className="text-sm" />
             </a>
           )}
 
@@ -67,7 +67,7 @@ const authors =
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
             >
-              <IconEPUB />
+              <IconEPUB className="text-sm" />
             </a>
           )}
 
@@ -79,7 +79,7 @@ const authors =
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
             >
-              <IconKindle />
+              <IconKindle className="text-sm" />
             </a>
           )}
 
@@ -91,7 +91,7 @@ const authors =
   title="Share"
   className="hover:opacity-80"
 >
-  <IconShare />
+  <IconShare className="text-sm" />
 </button>
         </div>
 
@@ -103,7 +103,7 @@ const authors =
           }}
           title={isLiked ? 'Liked' : 'Like this book'}
         >
-          {isLiked ? <IconHeart /> : <IconHeartOutline />}
+          {isLiked ? <IconHeart className="text-sm" /> : <IconHeartOutline className="text-sm" />}
         </button>
       </div>
     </div>

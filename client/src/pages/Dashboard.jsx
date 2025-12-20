@@ -9,6 +9,7 @@ import { useAuth } from "../AuthContext";
 import logo from "../assets/logo.png";
 import DashboardBookCard from "../components/DashboardBookCard";
 import GutenbergSliderCard from "../components/GutenbergSliderCard";
+import { IconEdit, IconTrash } from '../utils/icons';
 // GoogleSliderCard removed — Google Books API usage removed
 import { shareBook } from "../utils/shareBook";
 import { suggestCorrection } from '../utils/didYouMean';
@@ -79,6 +80,8 @@ const Dashboard = () => {
       const gutendexData = await gutendexResponse.json();
       const results = gutendexData.results || [];
       setFreeResults(results);
+      // ensure new searches show their results panel
+      setSearchExpanded(true);
       if (results.length === 0) {
         const suggestion = await suggestCorrection(query);
         setDidYouMean(suggestion);
@@ -136,13 +139,13 @@ const Dashboard = () => {
                   uniqueIds.map((id) =>
                     axios
                       .get(`https://gutendex.com/books/${id}`)
-                      .then((res2) => ({ id, title: res2.data?.title }))
-                      .catch(() => ({ id, title: null }))
+                      .then((res2) => ({ id, title: res2.data?.title, image: res2.data?.formats?.['image/jpeg'] }))
+                      .catch(() => ({ id, title: null, image: null }))
                   )
                 ).then((results) => {
                   const titles = {};
                   results.forEach((r2) => {
-                    if (r2.title) titles[String(r2.id)] = r2.title;
+                    if (r2.title) titles[String(r2.id)] = { title: r2.title, image: r2.image };
                   });
                   setBookTitles((prev) => ({ ...prev, ...titles }));
                 });
@@ -168,13 +171,13 @@ const Dashboard = () => {
       missing.map((id) =>
         axios
           .get(`https://gutendex.com/books/${id}`)
-          .then((res) => ({ id, title: res.data?.title }))
+          .then((res) => ({ id, title: res.data?.title, image: res.data?.formats?.['image/jpeg'] }))
           .catch(() => ({ id, title: null }))
       )
     ).then((results) => {
       const titles = {};
       results.forEach((r2) => {
-        if (r2.title) titles[String(r2.id)] = r2.title;
+        if (r2.title) titles[String(r2.id)] = { title: r2.title, image: r2.image };
       });
       setBookTitles((prev) => ({ ...prev, ...titles }));
     });
@@ -374,7 +377,6 @@ const Dashboard = () => {
           onSubmit={async (e) => {
             e.preventDefault();
             await handleSearch();
-            navigate('/');
           }}
           isLoading={isLoading}
         />
@@ -399,21 +401,21 @@ const Dashboard = () => {
           {/* Search results panel shown on Dashboard when search returns results */}
           {(freeResults?.length > 0) && (
             <div className="w-full mb-6">
-              <div className="flex items-center justify-end mb-2">
+              <div className="flex items-center justify-start mb-2">
                 <button
                   onClick={() => setSearchExpanded((s) => !s)}
                   aria-expanded={searchExpanded}
                   className="p-2 rounded-md hover:bg-gray-100"
                   title={searchExpanded ? 'Collapse results' : 'Expand results'}
                 >
-                  {searchExpanded ? (
-                    // up arrow (collapse)
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    {searchExpanded ? (
+                    // up arrow (collapse) - larger
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                       <path fillRule="evenodd" d="M5.23 12.97a.75.75 0 001.06 0L10 9.27l3.71 3.7a.75.75 0 101.06-1.06l-4.24-4.24a.75.75 0 00-1.06 0L5.23 11.91a.75.75 0 000 1.06z" clipRule="evenodd" />
                     </svg>
                   ) : (
-                    // down arrow (expand)
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    // down arrow (expand) - larger
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                       <path fillRule="evenodd" d="M14.77 7.03a.75.75 0 00-1.06 0L10 10.73 6.29 7.03a.75.75 0 10-1.06 1.06l4.24 4.24c.29.29.77.29 1.06 0l4.24-4.24a.75.75 0 000-1.06z" clipRule="evenodd" />
                     </svg>
                   )}
@@ -504,7 +506,7 @@ const Dashboard = () => {
                 {likedBooks.length === 0 ? (
                   <p className="text-gray-500 italic">No liked books yet.</p>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols- lg:grid-cols-4 xl:grid-cols-4 gap-4 justify-items-center">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-4 justify-items-center">
                     {likedBooks.map((book) => (
                       <DashboardBookCard
                         key={book._id}
@@ -533,74 +535,85 @@ const Dashboard = () => {
                   <p className="text-gray-500 italic">You have not written any reviews yet.</p>
                 ) : (
                   <ul className="space-y-4">
-                    {userReviews.map((rev) => (
-                      <li key={rev._id} className="rounded-2xl py-4 px-0">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <Link to={`/shared-book/${rev.bookId}`} className="text-black font-semibold text-md md:text-lg hover:underline">{bookTitles[String(rev.bookId)] || `#${rev.bookId}`}</Link>
-                            <div className="text-xs text-gray-500">{renderStars(rev.rating)}</div>
+                    {userReviews.map((rev) => {
+                      const info = bookTitles[String(rev.bookId)];
+                      const titleText = info?.title || `#${rev.bookId}`;
+                      const thumb = info?.image;
+                      return (
+                        <li key={rev._id} className="rounded-2xl py-4 px-0">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              {thumb ? (
+                                <img src={thumb} alt={titleText} className="w-12 h-16 object-cover rounded" />
+                              ) : (
+                                <div className="w-12 h-16 bg-gray-100 rounded flex items-center justify-center text-xs text-gray-400">No cover</div>
+                              )}
+                              <div>
+                                <Link to={`/shared-book/${rev.bookId}`} className="text-black font-semibold text-md md:text-lg hover:underline">{titleText}</Link>
+                                <div className="text-xs text-gray-500">{renderStars(rev.rating)}</div>
+                              </div>
+                            </div>
+                            <div className="text-xs text-gray-500">{rev.createdAt ? new Date(rev.createdAt).toLocaleDateString() : ''}</div>
                           </div>
-                          <div className="text-xs text-gray-500">{rev.createdAt ? new Date(rev.createdAt).toLocaleDateString() : ''}</div>
-                        </div>
-                        {editingReviewIdLocal !== rev._id ? (
-                          <>
-                            {rev.text ? <p className="mt-2 text-sm">{rev.text}</p> : null}
-                            <div className="flex gap-2 mt-2">
-                                <div className="flex items-center gap-2">
-                                  <button
-                                    onClick={() => {
-                                      setEditingReviewIdLocal(rev._id);
-                                      setEditingTextLocal(rev.text || '');
-                                      setEditingRatingLocal(rev.rating || 5);
-                                    }}
-                                    className="p-1 rounded text-blue-600 hover:bg-gray-100"
-                                    aria-label="Edit review"
-                                    title="Edit review"
-                                  >
-                                    {/* pencil icon */}
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                      <path d="M17.414 2.586a2 2 0 0 0-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 0 0 0-2.828z" />
-                                      <path d="M2 15.25V18h2.75l8.485-8.485-2.75-2.75L2 15.25z" />
-                                    </svg>
-                                  </button>
-                                  <button
-                                    onClick={() => handleDeleteReview(rev._id, rev.bookId)}
-                                    className="p-1 rounded text-red-600 hover:bg-gray-100"
-                                    aria-label="Delete review"
-                                    title="Delete review"
-                                  >
-                                    {/* trash icon */}
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                      <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H3a1 1 0 100 2h14a1 1 0 100-2h-2V3a1 1 0 00-1-1H6zm2 6a1 1 0 10-2 0v7a1 1 0 001 1h6a1 1 0 001-1V8a1 1 0 10-2 0v6H8V8z" clipRule="evenodd" />
-                                    </svg>
-                                  </button>
-                                </div>
+
+                          {editingReviewIdLocal !== rev._id ? (
+                            <>
+                              {rev.text ? <p className="mt-2 text-sm">{rev.text}</p> : null}
+                              <div className="flex gap-2 mt-2">
+                                  <div className="w-12 flex flex-col items-center">
+                                    <button
+                                      onClick={() => {
+                                        setEditingReviewIdLocal(rev._id);
+                                        setEditingTextLocal(rev.text || '');
+                                        setEditingRatingLocal(rev.rating || 5);
+                                      }}
+                                      className="p-1 rounded hover:bg-gray-100"
+                                      aria-label="Edit review"
+                                      title="Edit review"
+                                    >
+                                      <IconEdit className="text-base text-red-600" />
+                                    </button>
+                                    <span className="text-xs mt-1 text-red-600">Edit</span>
+                                  </div>
+
+                                  <div className="w-12 flex flex-col items-center">
+                                    <button
+                                      onClick={() => handleDeleteReview(rev._id, rev.bookId)}
+                                      className="p-1 rounded hover:bg-gray-100"
+                                      aria-label="Delete review"
+                                      title="Delete review"
+                                    >
+                                      <IconTrash className="text-sm text-red-600" />
+                                    </button>
+                                    <span className="text-xs mt-1 text-red-600">Delete</span>
+                                  </div>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="mt-2">
+                              <label className="text-xs">Rating</label>
+                              <select value={editingRatingLocal} onChange={(e) => setEditingRatingLocal(Number(e.target.value))} className="block mt-1 text-sm p-1 rounded">
+                                <option value={1}>1</option>
+                                <option value={2}>2</option>
+                                <option value={3}>3</option>
+                                <option value={4}>4</option>
+                                <option value={5}>5</option>
+                              </select>
+                              <label className="text-xs mt-2 block">Review</label>
+                              <textarea value={editingTextLocal} onChange={(e) => setEditingTextLocal(clampTextLocal(e.target.value))} rows={3} className="w-full mt-1 text-sm p-1 rounded" />
+                              <div className="mt-1 flex justify-between text-xs text-gray-500">
+                                <div>{(editingTextLocal || "").length}/{MAX_REVIEW_CHARS} chars</div>
+                                <div>{countParagraphsLocal(editingTextLocal)} / 3 paragraphs</div>
+                              </div>
+                              <div className="flex gap-2 mt-2">
+                                <button onClick={() => { handleUpdateReview(rev._id, rev.bookId, { rating: editingRatingLocal, text: editingTextLocal }); setEditingReviewIdLocal(null); }} className="text-xs bg-[#cd2126] text-white px-2 py-1 rounded">Save</button>
+                                <button onClick={() => setEditingReviewIdLocal(null)} className="text-xs px-2 py-1 rounded">Cancel</button>
+                              </div>
                             </div>
-                          </>
-                        ) : (
-                          <div className="mt-2">
-                            <label className="text-xs">Rating</label>
-                            <select value={editingRatingLocal} onChange={(e) => setEditingRatingLocal(Number(e.target.value))} className="block mt-1 text-sm p-1 rounded">
-                              <option value={1}>1</option>
-                              <option value={2}>2</option>
-                              <option value={3}>3</option>
-                              <option value={4}>4</option>
-                              <option value={5}>5</option>
-                            </select>
-                            <label className="text-xs mt-2 block">Review</label>
-                            <textarea value={editingTextLocal} onChange={(e) => setEditingTextLocal(clampTextLocal(e.target.value))} rows={3} className="w-full mt-1 text-sm p-1 rounded" />
-                            <div className="mt-1 flex justify-between text-xs text-gray-500">
-                              <div>{(editingTextLocal || "").length}/{MAX_REVIEW_CHARS} chars</div>
-                              <div>{countParagraphsLocal(editingTextLocal)} / 3 paragraphs</div>
-                            </div>
-                            <div className="flex gap-2 mt-2">
-                              <button onClick={() => { handleUpdateReview(rev._id, rev.bookId, { rating: editingRatingLocal, text: editingTextLocal }); setEditingReviewIdLocal(null); }} className="text-xs bg-[#cd2126] text-white px-2 py-1 rounded">Save</button>
-                              <button onClick={() => setEditingReviewIdLocal(null)} className="text-xs px-2 py-1 rounded">Cancel</button>
-                            </div>
-                          </div>
-                        )}
-                      </li>
-                    ))}
+                          )}
+                        </li>
+                      );
+                    })}
                   </ul>
                 )}
               </div>

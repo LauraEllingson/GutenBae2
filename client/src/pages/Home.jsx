@@ -7,13 +7,9 @@ import axios from 'axios';
 import GutenbergSliderCard from '../components/GutenbergSliderCard';
 import { useSearch } from '../SearchContext';
 import { shareBook } from '../utils/shareBook';
-import { suggestCorrection } from '../utils/didYouMean';
 import logo from '../assets/logo.png';
 
-const truncateTitle = (title) => {
-  const match = title.match(/(.+?[:;!?—–-])/);
-  return match ? match[1] : title;
-};
+// (previous truncateTitle removed — not used)
 
 const Home = () => {
   const navigate = useNavigate();
@@ -25,7 +21,7 @@ const Home = () => {
   } = useSearch();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [didYouMean, setDidYouMean] = useState(null);
+  // simple no-results message state handled directly during render
   const [loggedIn, setLoggedIn] = useState(false);
   const [likedBookIds, setLikedBookIds] = useState(new Set());
   const [likeMessage, setLikeMessage] = useState('');
@@ -73,14 +69,10 @@ const Home = () => {
       const results = gutendexData.results || [];
       setFreeResults(results);
       if ((results || []).length === 0) {
-        // try to find a correction suggestion
-        const suggestion = await suggestCorrection(query);
-        setDidYouMean(suggestion);
-      } else {
-        setDidYouMean(null);
+        // no suggestions UI — just leave freeResults empty and render a simple message
       }
-    } catch (error) {
-      console.error('Search failed:', error);
+    } catch {
+      console.error('Search failed');
     } finally {
       setIsLoading(false);
     }
@@ -121,7 +113,7 @@ const Home = () => {
       setLikedBookIds((prev) => new Set(prev).add(id));
       setLikeMessage('Book liked and saved to your library!');
       setTimeout(() => setLikeMessage(''), 3000);
-    } catch (error) {
+    } catch {
       setLikeMessage('This book is already in your library.');
       setTimeout(() => setLikeMessage(''), 3000);
     }
@@ -151,19 +143,9 @@ const Home = () => {
   isLoading={isLoading}
 />
 
-        {didYouMean && (
+        {!isLoading && query.trim() && freeResults.length === 0 && (
           <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 mt-2 text-sm text-gray-700">
-            Did you mean:{' '}
-            <button
-              className="underline text-[#cd2126]"
-              onClick={async () => {
-                setQuery(didYouMean);
-                setDidYouMean(null);
-                await handleSearch();
-              }}
-            >
-              {didYouMean}
-            </button>
+            Your search returned no results. Check spelling or author may not be in the public domain.
           </div>
         )}
 
@@ -174,7 +156,7 @@ const Home = () => {
               Free from Project Gutenberg
             </h2>
             <div className="relative">
-              <div className="flex sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 overflow-x-auto sm:overflow-visible px-2 sm:px-6 pb-2 sm:pb-0">
+              <div className="flex sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-4 sm:gap-6 overflow-x-auto sm:overflow-visible px-2 sm:px-6 pb-2 sm:pb-0">
                 {(showAllFree ? freeResults : freeResults.slice(0, 8)).map((book, index) => (
                   <div
                     key={index}
